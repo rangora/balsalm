@@ -1,0 +1,62 @@
+# visual studio
+.vs/
+*.sln
+*.suo
+*.db
+
+# Generated files
+.Build/
+.Intermediate/
+.Binaries/
+.Saved/
+*.VC.db
+*.VC.opendb
+DerivedDataCache/*
+
+# Content
+Contnet/AnimStarterPack
+Contnet/InfinityBladeWarriors
+Contnet/InfinityBladeWeapons
+Contnet/Mannequin
+Contnet/MCO_Mocap_Basics
+Contnet/Meadow_Environment_Set
+Contnet/Resources
+Contnet/ThirdPerson
+Contnet/ThirdPersonCPP
+*_BuiltData.uasset
+
+# Src
+Source/FBX
+Source/Maya
+Source/Motionbuilder
+Source/SKMannequin_A_Pose
+Source/SKMannequin_T_Pose
+
+
+# Compiled byproduct
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled header
+*.gch
+*.pch
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+*.ipa
+
+# Plugins
+Plugins/Astar/Binaries
+Plugins/Astar/Intermediate
+Plugins/FogOFWar/Binaries
+Plugins/FogOFWar/Intermediate
