@@ -5,24 +5,24 @@
 *.db
 
 # Generated files
-.Build/
-.Intermediate/
-.Binaries/
-.Saved/
+Build/
+Intermediate/
+Binaries/
+Saved/
 *.VC.db
 *.VC.opendb
 DerivedDataCache/*
 
 # Content
-Contnet/AnimStarterPack
-Contnet/InfinityBladeWarriors
-Contnet/InfinityBladeWeapons
-Contnet/Mannequin
-Contnet/MCO_Mocap_Basics
-Contnet/Meadow_Environment_Set
-Contnet/Resources
-Contnet/ThirdPerson
-Contnet/ThirdPersonCPP
+Contnet/AnimStarterPack/
+Contnet/InfinityBladeWarriors/
+Contnet/InfinityBladeWeapons/
+Contnet/Mannequin/
+Contnet/MCO_Mocap_Basics/
+Contnet/Meadow_Environment_Set/
+Contnet/Resources/
+Contnet/ThirdPerson/
+Contnet/ThirdPersonCPP/
 *_BuiltData.uasset
 
 # Src
