@@ -14,15 +14,15 @@ Saved/
 DerivedDataCache/*
 
 # Content
-Contnet/AnimStarterPack/
-Contnet/InfinityBladeWarriors/
-Contnet/InfinityBladeWeapons/
-Contnet/Mannequin/
-Contnet/MCO_Mocap_Basics/
-Contnet/Meadow_Environment_Set/
-Contnet/Resources/
-Contnet/ThirdPerson/
-Contnet/ThirdPersonCPP/
+Content/AnimStarterPack
+Content/InfinityBladeWarriors
+Content/InfinityBladeWeapons
+Content/Mannequin
+Content/MCO_Mocap_Basics
+Content/Meadow_Environment_Set
+Content/Resources
+Content/ThirdPerson
+Content/ThirdPersonCPP
 *_BuiltData.uasset
 
 # Src
