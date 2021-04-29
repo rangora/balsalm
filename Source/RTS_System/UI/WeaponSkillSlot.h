@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "CommonSlot.h"
 #include "../DataTable/ABaseSkillTable.h"
+#include "../ActorType.h"
 #include "WeaponSkillSlot.generated.h"
 
 /**
  * 
  */
 
-static FString VisualWidgetPath = "/Game/UI/UI_Slot.UI_Slot_C";
+class USkillObject;
 
 UCLASS()
 class RTS_SYSTEM_API UWeaponSkillSlot : public UCommonSlot {
@@ -22,10 +23,16 @@ public:
 	void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 	FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
 	FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-	bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
+	void OverWrite(const UUserWidget* Origin);
 
-	virtual void SetThumbnailImage() override;
+	virtual void DropAction(const UUserWidget* From) override;
 
-	BaseSkillData_Info* SkillData = nullptr;
+	WEAPONTYPE WeaponType;
+	int32 SkillIndex;
+	// or
+	UPROPERTY()
+		USkillObject* SkillObject;
 };
+
+

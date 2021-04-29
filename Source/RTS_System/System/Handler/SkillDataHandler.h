@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SkillObject.h"
 #include "../../ActorType.h"
 #include "UObject/NoExportTypes.h"
 #include "SkillDataHandler.generated.h"
@@ -14,27 +15,28 @@
 
 class UDataTable;
 class UUserWidget;
-struct BaseSkillData_Info;
-struct AttackSkillData_Info;
+class UWidget;
 
 
 UCLASS()
 class RTS_SYSTEM_API USkillDataHandler : public UObject {
 	GENERATED_BODY()
+
+	typedef TArray<USkillObject*> SArray;
+
 public:
 	USkillDataHandler();
+	void UpdateWeaponSkillSlot(TArray<UWidget*>& Slots, const WEAPONTYPE WeaponType);
 	
-	void SetSkillData(SKILLTYPE skillType, int32 skill_id, BaseSkillData_Info* pSkillContainer);
-	void SetAxeSkillData(TArray<UWidget*>& Slots);
-	void SetGunSkillData(TArray<UWidget*>& Slots);
-
 
 	UPROPERTY()
-		UDataTable* AttackSkillTable;
+		TArray<USkillObject*> AxeSkills;
+	UPROPERTY()
+		TArray<USkillObject*> GunSkills;
+	UPROPERTY()
+		UDataTable* SkillVariableTable;
 
 private:
-	void SetAttackSkillData(int32 skill_id, AttackSkillData_Info* pSkillContainer);
-
-	TArray<int32> AxeSkillIndex;
-	TArray<int32> GunSkillIndex;
+	void InitSkillVariable();
+	void SetWeaponSkilData(TArray<UWidget*>& Slots, const SArray* SkillArray, WEAPONTYPE WeaponType);
 };

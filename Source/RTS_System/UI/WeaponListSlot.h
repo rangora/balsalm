@@ -17,8 +17,10 @@ class RTS_SYSTEM_API UWeaponListSlot : public UCommonSlot {
 	GENERATED_BODY()
 public:
 	virtual void NativeConstruct() override;
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;	
+
 	virtual void WidgetLinkOperation() override;
+	virtual void DropAction(const UUserWidget* From) override;
 
 	void bBorderImageVisible(bool visibility);
 

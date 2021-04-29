@@ -17,8 +17,8 @@ UCLASS()
 class RTS_SYSTEM_API USkillControlUI : public UUserWidget {
 	GENERATED_BODY()
 public:
+	USkillControlUI(const FObjectInitializer& Initializer);
 	virtual void NativeConstruct() override;
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 	void OpenOrClose();
 	void UpdateWeaponSkillList();
@@ -27,6 +27,7 @@ public:
 		TArray<UUserWidget*> WeaponSlotArray;
 
 	WEAPONTYPE SelectedWeapon;
+	WEAPONTYPE UsedWeapon;
 
 private:
 	void WeaponPanelInit();

@@ -3,29 +3,16 @@
 
 #include "WeaponSkillSlot.h"
 #include "DragDropWidget.h"
+#include "SkillControlUI.h"
 #include "Engine/Texture2D.h"
+#include "Components/Image.h"
+#include "../System/MainController.h"
+#include "../System/Handler/SkillObject.h"
 
-UWeaponSkillSlot::~UWeaponSkillSlot() {
-	if (SkillData != nullptr)
-		delete SkillData;
-}
+UWeaponSkillSlot::~UWeaponSkillSlot() {}
 
 void UWeaponSkillSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-
-	if (bAssigned) {
-		auto Oper = Cast<UDragDropWidget>(UWidgetBlueprintLibrary::CreateDragDropOperation(UDragDropWidget::StaticClass()));
-		auto VisualClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *VisualWidgetPath));
-
-		if (IsValid(VisualClass)) {
-			auto visual = Cast<UCommonSlot>(CreateWidget<UUserWidget>(GetWorld(), VisualClass));
-			visual->CurrentTexture = this->SkillData->Thumbnail;
-			visual->SetThumbnailImage();
-			Oper->DefaultDragVisual = visual;
-			OutOperation = Oper;
-		}
-	}
-
 }
 
 FReply UWeaponSkillSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) {
@@ -33,29 +20,39 @@ FReply UWeaponSkillSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 	reply.NativeReply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 	if (!bAssigned) return reply.NativeReply;
 
-	if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton) == true) {
-		reply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
-	}
-
 	return reply.NativeReply;
 }
 
 FReply UWeaponSkillSlot::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) {
 	FEventReply reply;
+	reply.NativeReply = Super::NativeOnMouseButtonUp(InGeometry, InMouseEvent);
 
 	return reply.NativeReply;
 }
 
-bool UWeaponSkillSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) {
-	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
-	
-	auto Oper = Cast<UDragDropWidget>(InOperation);
-	if (Oper!=nullptr) {
-	}
-	
-	return false;
+void UWeaponSkillSlot::OverWrite(const UUserWidget* Origin) {
+	auto Fromslot = Cast<UWeaponSkillSlot>(Origin);
+	SkillObject = Fromslot->SkillObject;
+	CurrentTexture = Fromslot->CurrentTexture;
+	SetThumbnailImage();
 }
 
-void UWeaponSkillSlot::SetThumbnailImage() {
-	ThumbnailImage->SetBrushFromTexture(SkillData->Thumbnail);
+void UWeaponSkillSlot::DropAction(const UUserWidget* From) {
+	if (From->IsA(UWeaponSkillSlot::StaticClass())) {
+		auto IController = Cast<AMainController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		auto SkillPanel = Cast<USkillControlUI>(IController->SkillControlUIWidget);
+		auto FromSlot = Cast<UWeaponSkillSlot>(From);
+
+		if (SkillPanel->UsedWeapon == FromSlot->WeaponType) {
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("UWeaponListSlot::SameWeaponType"));
+			
+			OverWrite(FromSlot);
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, 
+				FString::Printf(TEXT("UWeaponListSlot::%f"), SkillObject->SkillParams->Variable01));
+
+		}
+		else {
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("UWeaponListSlot::DiffWeaponType"));
+		}
+	}
 }

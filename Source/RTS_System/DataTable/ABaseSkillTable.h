@@ -9,66 +9,34 @@
 
 
 USTRUCT(BlueprintType)
-struct FBaseSkillDataTable : public FTableRowBase {
+struct FSkillVariable : public FTableRowBase {
 	GENERATED_BODY()
 
-	FBaseSkillDataTable();
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkillData)
-		int Skill_ID;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkillData)
-		SKILLTYPE SkillType;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkillData)
-		FString SkillName;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkillData)
-		FString Description;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkillData)
-		float CoolTime;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkillData)
-		UTexture2D* Thumbnail;
+	UPROPERTY(EditAnywhere) int32 Skill_ID = -1;
+	UPROPERTY(EditAnywhere) float Variable01 = 0.f;
+	UPROPERTY(EditAnywhere) float Variable02 = 0.f;
+	UPROPERTY(EditAnywhere) float Variable03 = 0.f;
+	UPROPERTY(EditAnywhere) float Variable04 = 0.f;
+	UPROPERTY(EditAnywhere) float Variable05 = 0.f;
+	UPROPERTY(EditAnywhere) float Variable06 = 0.f;
+	UPROPERTY(EditAnywhere) float Variable07 = 0.f;
+	UPROPERTY(EditAnywhere) float Variable08 = 0.f;
+	UPROPERTY(EditAnywhere) float Variable09 = 0.f;
+	UPROPERTY(EditAnywhere) float Variable10 = 0.f;
+	UPROPERTY(EditAnywhere) UTexture2D* ThumbnailTexture;
 };
 
-USTRUCT(BlueprintType)
-struct FAttackSkillDataTable : public FBaseSkillDataTable {
-	GENERATED_BODY()
-
-	FAttackSkillDataTable();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkillData)
-		float BaseDamage;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkillData)
-		float DamageRate;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkillData)
-		float AttackRange;
-};
-
-USTRUCT(BlueprintType)
-struct FSpecifiedSkillTable : public FBaseSkillDataTable {
-	GENERATED_BODY()
-
-	FSpecifiedSkillTable();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkillData)
-		SKILLSHAPE SkillShape;
-};
-
-
-
-struct BaseSkillData_Info {
-	int Skill_ID;
-	SKILLTYPE SkillType;
-	FString SkillName;
-	FString Description;
-	float CoolTime;
-	UTexture2D* Thumbnail;
-};
-
-struct AttackSkillData_Info : public BaseSkillData_Info {
-	float BaseDamage;
-	float DamageRate;
-	float AttackRange;
-};
-
-struct SpecifiedSkillTable : public AttackSkillData_Info {
-	SKILLSHAPE SkillShape;
+struct SkillVariable {
+	int32 Skill_ID;
+	float Variable01;
+	float Variable02;
+	float Variable03;
+	float Variable04;
+	float Variable05;
+	float Variable06;
+	float Variable07;
+	float Variable08;
+	float Variable09;
+	float Variable10;
+	UTexture2D* ThumbnailTexture;
 };

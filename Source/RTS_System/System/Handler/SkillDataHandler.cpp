@@ -3,88 +3,90 @@
 
 #include "SkillDataHandler.h"
 #include "Engine.h"
+#include "AllSkill.h"
 #include "Components/Widget.h"
+#include "UObject/ConstructorHelpers.h"
 #include "../../UI/WeaponSkillSlot.h"
 #include "../../DataTable/ABaseSkillTable.h"
-#include "UObject/ConstructorHelpers.h"
+
 
 USkillDataHandler::USkillDataHandler() {
-	static ConstructorHelpers::FObjectFinder<UDataTable> AttackSkillTable_Class(
-		TEXT("/Game/DataTable/Skill/AttackSkillTable.AttackSkillTable"));
-	if (AttackSkillTable_Class.Succeeded()) {
-		AttackSkillTable = AttackSkillTable_Class.Object;
-	}
+	ConstructorHelpers::FObjectFinder<UDataTable> SkillVariableTable_Class(
+		TEXT("/Game/DataTable/Skill/SkillVariableTable.SkillVariableTable"));
+	if (SkillVariableTable_Class.Succeeded()) 
+		SkillVariableTable = SkillVariableTable_Class.Object;
+	
+	// Creating Skill Table..
+	AxeSkills.Add(NewObject<UAxe_SkullCrash>());
+	AxeSkills.Add(NewObject<UAxe_DualStrike>());
+	GunSkills.Add(NewObject<UGun_CripplingShot>());
 
-	AxeSkillIndex.Add(1);
-	AxeSkillIndex.Add(3);
-	GunSkillIndex.Add(2);
+	InitSkillVariable();
 }
 
-void USkillDataHandler::SetSkillData(SKILLTYPE skillType, int32 skill_id, BaseSkillData_Info* pSkillContainer) {
-	switch (skillType) {
-	
-	case SKILLTYPE::WEAPON_MELEE: {
-		auto skillContainer = (AttackSkillData_Info*)pSkillContainer;
-		SetAttackSkillData(skill_id, skillContainer);
+void USkillDataHandler::UpdateWeaponSkillSlot(TArray<UWidget*>& Slots, const WEAPONTYPE WeaponType) {
+	SArray* Target = nullptr;
+
+	switch (WeaponType) {
+	case WEAPONTYPE::AXE: {
+		Target = &AxeSkills;
 		break;
 	}
-	
-	case SKILLTYPE::WEAPON_RANGE: {
+	case WEAPONTYPE::GUN: {
+		Target = &GunSkills;
 		break;
 	}
-	case SKILLTYPE::UTILITY: {
-		break;
 	}
+	SetWeaponSkilData(Slots, Target, WeaponType);
+}
+
+void USkillDataHandler::InitSkillVariable() {
+	TArray<SArray*> SkillIndexMatrix;
+	SkillIndexMatrix.Add(&AxeSkills);
+	SkillIndexMatrix.Add(&GunSkills);
+
+	for (auto Row : SkillIndexMatrix) {
+		for (auto Element : *Row) {
+			auto Origin = SkillVariableTable->FindRow<FSkillVariable>(Element->Skill_ID, "");
+			Element->SkillParams = new SkillVariable;
+			Element->SkillParams->Skill_ID = Origin->Skill_ID;
+			Element->SkillParams->Variable01 = Origin->Variable01;
+			Element->SkillParams->Variable02 = Origin->Variable02;
+			Element->SkillParams->Variable03 = Origin->Variable03;
+			Element->SkillParams->Variable04 = Origin->Variable04;
+			Element->SkillParams->Variable05 = Origin->Variable05;
+			Element->SkillParams->Variable06 = Origin->Variable06;
+			Element->SkillParams->Variable07 = Origin->Variable07;
+			Element->SkillParams->Variable08 = Origin->Variable08;
+			Element->SkillParams->Variable09 = Origin->Variable09;
+			Element->SkillParams->Variable10 = Origin->Variable10;
+			Element->SkillParams->ThumbnailTexture = Origin->ThumbnailTexture;
+		}
 	}
 }
 
-void USkillDataHandler::SetAxeSkillData(TArray<UWidget*>& Slots) {
+void USkillDataHandler::SetWeaponSkilData(TArray<UWidget*>& Slots, const SArray* SkillArray, WEAPONTYPE WeaponType) {
+	if (SkillArray == nullptr) return;
+	
 	for (int idx = 0; idx < Slots.Num(); idx++) {
 		auto slot = Cast<UWeaponSkillSlot>(Slots[idx]);
 
-		if (AxeSkillIndex.IsValidIndex(idx)) {
-			slot->SkillData = new AttackSkillData_Info;
-			SetSkillData(SKILLTYPE::WEAPON_MELEE, AxeSkillIndex[idx], slot->SkillData);
-			slot->SetThumbnailImage();
-			slot->bAssigned = true;
-		}
-		else {
-			if (slot->SkillData != nullptr)
-				delete slot->SkillData;
-			slot->SetDefaultThumbnailImage();
-			slot->bAssigned = false;
-		}
-	}
-}
+		if (IsValid(slot)) {
+			if (SkillArray->IsValidIndex(idx)) {
+				slot->CurrentTexture = (*SkillArray)[idx]->SkillParams->ThumbnailTexture;
+				slot->SetThumbnailImage();
+				slot->WeaponType = WeaponType;
+				slot->SkillObject = (*SkillArray)[idx];
+				slot->bAssigned = true;
+				slot->bDragable = true;
+			}
 
-void USkillDataHandler::SetGunSkillData(TArray<UWidget*>& Slots) {
-	for (int idx = 0; idx < Slots.Num(); idx++) {
-		auto slot = Cast<UWeaponSkillSlot>(Slots[idx]);
-		
-		if (GunSkillIndex.IsValidIndex(idx)) {
-			slot->SkillData = new AttackSkillData_Info;
-			SetSkillData(SKILLTYPE::WEAPON_MELEE, GunSkillIndex[idx], slot->SkillData);
-			slot->SetThumbnailImage();
+			else {
+				slot->SetDefaultThumbnailImage();
+				slot->WeaponType = WEAPONTYPE::NONE;
+				slot->bAssigned = false;
+				slot->bDragable = false;
+			}
 		}
-		else {
-			if (slot->SkillData != nullptr)
-				delete slot->SkillData;
-			slot->SetDefaultThumbnailImage();
-		}
-	}
-}
-
-void USkillDataHandler::SetAttackSkillData(int32 skill_id, AttackSkillData_Info* pSkillContainer) {
-	auto Skill_info = AttackSkillTable->FindRow<FAttackSkillDataTable>(*FString::FromInt(skill_id), TEXT(""));
-	if (Skill_info != nullptr) {
-		pSkillContainer->AttackRange = Skill_info->AttackRange;
-		pSkillContainer->BaseDamage = Skill_info->BaseDamage;
-		pSkillContainer->CoolTime = Skill_info->CoolTime;
-		pSkillContainer->DamageRate = Skill_info->DamageRate;
-		pSkillContainer->Description = Skill_info->Description;
-		pSkillContainer->SkillName = Skill_info->SkillName;
-		pSkillContainer->SkillType = Skill_info->SkillType;
-		pSkillContainer->Skill_ID = Skill_info->Skill_ID;
-		pSkillContainer->Thumbnail = Skill_info->Thumbnail;
 	}
 }

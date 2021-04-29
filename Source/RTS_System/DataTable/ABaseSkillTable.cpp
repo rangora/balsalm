@@ -3,8 +3,3 @@
 
 #include "ABaseSkillTable.h"
 
-FBaseSkillDataTable::FBaseSkillDataTable() : CoolTime(1.f) {}
-
-FAttackSkillDataTable::FAttackSkillDataTable() :BaseDamage(0.f), DamageRate(0.f) {}
-
-FSpecifiedSkillTable::FSpecifiedSkillTable() {}

@@ -2,9 +2,11 @@
 
 
 #include "WeaponListSlot.h"
+#include "DragDropWidget.h"
 #include "SkillControlUI.h"
 #include "../System/MainController.h"
 #include "Components/VerticalBox.h"
+#include "Components/Image.h"
 
 void UWeaponListSlot::bBorderImageVisible(bool visibility) {
 	if (visibility)	BorderImage->SetVisibility(ESlateVisibility::Visible);
@@ -30,11 +32,12 @@ FReply UWeaponListSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, con
 				bBorderImageVisible(true);
 				SelectedSlot = this;
 			}
-			else if(SelectedSlot!=this) {
+			else if (SelectedSlot != this) {
 				SelectedSlot->bBorderImageVisible(false);
 				bBorderImageVisible(true);
 				SelectedSlot = this;
 			}
+			else return reply.NativeReply;
 		}
 	}
 	WidgetLinkOperation();
@@ -49,5 +52,19 @@ void UWeaponListSlot::WidgetLinkOperation() {
 			SkillPanel->SelectedWeapon = SelectedSlot->WeaponType;
 			SkillPanel->UpdateWeaponSkillList();
 		}
+	}
+}
+
+void UWeaponListSlot::DropAction(const UUserWidget* From) {
+	if (From->IsA(UWeaponListSlot::StaticClass())) {
+		auto FromSlot = Cast<UWeaponListSlot>(From);
+		
+		// Get ref.
+		CurrentTexture = FromSlot->CurrentTexture;
+		WeaponType = FromSlot->WeaponType;
+		SetThumbnailImage();
+
+		auto SkillPanel = Cast<USkillControlUI>(WidgetLink.Get());
+		SkillPanel->UsedWeapon = WeaponType;
 	}
 }

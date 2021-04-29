@@ -13,21 +13,11 @@
 #include "UMG/Public/Components/UniformGridPanel.h"
 #include "Components/VerticalBox.h"
 
+USkillControlUI::USkillControlUI(const FObjectInitializer& Initializer)
+	: Super(Initializer), 
+	SelectedWeapon(WEAPONTYPE::NONE),
+	UsedWeapon(WEAPONTYPE::NONE) {
 
-
-bool USkillControlUI::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) {
-	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
-	
-	auto Oper = Cast<UDragDropWidget>(InOperation);
-	if (Oper == nullptr) {
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Orange, TEXT("Skill UI : NativeOnDrop  nullptr@@"));
-	}
-	else {
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("Skill UI : NativeOnDrop No NULL"));
-
-	}
-
-	return true;
 }
 
 void USkillControlUI::OpenOrClose() {
@@ -41,29 +31,7 @@ void USkillControlUI::UpdateWeaponSkillList() {
 	auto IInstance = Cast<UMainInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	auto SkillHandler = IInstance->SkillDataHandler;
 
-	switch (SelectedWeapon) {
-	case WEAPONTYPE::SWORD: 
-		break;
-	case WEAPONTYPE::AXE:
-		SkillHandler->SetAxeSkillData(WeaponSkillSlots);
-		break;
-	case WEAPONTYPE::BOW:
-		break;
-	case WEAPONTYPE::GUN:
-		SkillHandler->SetGunSkillData(WeaponSkillSlots);
-		break;
-	default :
-		break;
-	}
-	//
-	//if (IsValid(WeaponSkillPanel)) {
-	//	auto WeaponSkillSlots = WeaponSkillPanel->GetAllChildren();
-	//	auto IInstance = Cast<UMainInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	//	auto SkillHandler = IInstance->SkillDataHandler;
-
-	//	if (IsValid(SkillHandler)) 
-	//		SkillHandler->SetAxeSkillData(WeaponSkillSlots);
-	//}
+	SkillHandler->UpdateWeaponSkillSlot(WeaponSkillSlots, SelectedWeapon);
 }
 
 void USkillControlUI::WeaponPanelInit() {
@@ -86,6 +54,7 @@ void USkillControlUI::WeaponPanelInit() {
 			WeaponSlot->SetThumbnailImage();
 			WeaponSlot->WeaponType = TypeList[i];
 			WeaponSlot->bAssigned = true;
+			WeaponSlot->bDragable = true;
 			WeaponSlotArray.Add(WeaponSlot);
 		}
 	}

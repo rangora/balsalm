@@ -20,6 +20,7 @@ enum class ITEMTYPE : uint8 {
 
 UENUM(BlueprintType)
 enum class WEAPONTYPE : uint8 {
+	NONE UMETA(DisplayName = "NONE"),
 	SWORD UMETA(DisplayName = "SWORD"),
 	AXE UMETA(DisplayName = "AXE"),
 	BOW UMETA(DisplayName = "BOW"),
@@ -42,9 +43,11 @@ enum class ATTACKTYPE : uint8 {
 
 UENUM(BlueprintType)
 enum class SKILLTYPE : uint8 {
-	WEAPON_MELEE UMETA(DisplayName = "MeleeWeapon"),
-	WEAPON_RANGE UMETA(DisplayName = "RangeWeapon"),
-	UTILITY UMETA(DisplayName = "Utility"),
+	TARGETINGSKILL UMETA(DisplayName = "TargetingSkill"),
+	AREASKILL UMETA(DisplayName = "AreaSkill"),
+	BUFF UMETA(DisplayName = "Buff"),
+	MEZ UMETA(DisplayName = "Mez"),
+	SPECIAL UMETA(DisplayName = "Special"),
 };
 
 UENUM(BlueprintType)
