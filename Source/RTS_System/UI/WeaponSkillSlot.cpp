@@ -34,6 +34,7 @@ void UWeaponSkillSlot::OverWrite(const UUserWidget* Origin) {
 	auto Fromslot = Cast<UWeaponSkillSlot>(Origin);
 	SkillObject = Fromslot->SkillObject;
 	CurrentTexture = Fromslot->CurrentTexture;
+	bAssigned = true;
 	SetThumbnailImage();
 }
 
@@ -43,16 +44,10 @@ void UWeaponSkillSlot::DropAction(const UUserWidget* From) {
 		auto SkillPanel = Cast<USkillControlUI>(IController->SkillControlUIWidget);
 		auto FromSlot = Cast<UWeaponSkillSlot>(From);
 
-		if (SkillPanel->UsedWeapon == FromSlot->WeaponType) {
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("UWeaponListSlot::SameWeaponType"));
-			
-			OverWrite(FromSlot);
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, 
-				FString::Printf(TEXT("UWeaponListSlot::%f"), SkillObject->SkillParams->Variable01));
-
-		}
-		else {
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("UWeaponListSlot::DiffWeaponType"));
+		if (IsValid(FromSlot->SkillObject)) {
+			if (SkillPanel->UsedWeapon == FromSlot->SkillObject->SkillParams->WeaponType) {
+				OverWrite(FromSlot);
+			}
 		}
 	}
 }

@@ -7,12 +7,18 @@
 #include "GameFramework/PlayerController.h"
 #include "MainController.generated.h"
 
+
+
 class UUserWidget;
+
+
 
 UCLASS()
 class RTS_SYSTEM_API AMainController : public APlayerController {
 	GENERATED_BODY()
 	
+
+
 public:
 	AMainController();
 	virtual void SetupInputComponent() override;
@@ -20,6 +26,8 @@ public:
 	void SetSkillPanelVisibility();
 	void OpenOrCloseSkillPanel();
 
+	UFUNCTION()
+		void ActiveQuickSlot(int32 idx);
 
 	UFUNCTION(BlueprintCallable)
 		void SetUnits(TArray<AActor*> pUnits, bool bClicked);
@@ -31,7 +39,13 @@ public:
 	UPROPERTY()
 		UUserWidget* SkillControlUIWidget;
 
+
 private:
+	// Input delegate for quick slots.
+	DECLARE_DELEGATE_OneParam(FQuickSlotAction, int32);
+
+	bool IsOnlyOneAllyUnitSelected();
+
 	// User interface class.
 	UPROPERTY()
 		class TSubclassOf<UUserWidget> SkillControlUIClass;

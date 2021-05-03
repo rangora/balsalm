@@ -41,14 +41,13 @@ public:
 	
 	UPROPERTY()
 		UTexture2D* CurrentTexture;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-		bool bCopiable = false;
 
 	// Init in NativeConstruct().
 	UPROPERTY()
 		TWeakObjectPtr<UUserWidget> WidgetLink;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		bool bCopiable = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool bAssigned = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

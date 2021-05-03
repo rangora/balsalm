@@ -4,11 +4,19 @@
 #include "BaseMeleeUnit.h"
 #include "Component/StatComponent.h"
 #include "Component/AstarComponent.h"
+#include "Component/ArmStatComponent.h"
 #include "Animation/MeleeAnimInstance.h"
 #include "../../ActorType.h"
 #include "../../System/MainGameMode.h"
+#include "../../System/Handler/SkillObject.h"
+//#include "../../UI/SkillControlUI.h"
+
 
 ABaseMeleeUnit::ABaseMeleeUnit() : bReadyBasicAttack(false) {
+	ArmStatComponent = NewObject<UArmStatComponent>();
+
+	for (int i = 0; i < UNIT_SKILLSLOT_LENGTH; i++)
+		ArmStatComponent->SkillArray.Add(NewObject<USkillObject>());
 }
 
 void ABaseMeleeUnit::Tick(float delta) {

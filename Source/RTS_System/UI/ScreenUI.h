@@ -19,7 +19,10 @@ public:
 	UScreenUI(const FObjectInitializer& ObjectInitializer);
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float delta) override;
+	
 	void SetSkillPanelVisibility(bool trigger);
+	void UpdateSkillPanel();
+
 
 	UPROPERTY()
 		UGridPanel* SkillPanel;

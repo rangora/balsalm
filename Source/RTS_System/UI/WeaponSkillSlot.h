@@ -28,11 +28,9 @@ public:
 
 	virtual void DropAction(const UUserWidget* From) override;
 
-	WEAPONTYPE WeaponType;
-	int32 SkillIndex;
-	// or
+	// This can be Nullptr;
 	UPROPERTY()
-		USkillObject* SkillObject;
+		USkillObject* SkillObject = nullptr;
 };
 
 

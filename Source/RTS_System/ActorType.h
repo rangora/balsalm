@@ -5,6 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 
+#define EMPTYSKILL "-1";
+
+const FName EMPTY_SKILL_ID = "-1";
+const int32 UNIT_SKILLSLOT_LENGTH = 4;
+
 UENUM(BlueprintType)
 enum class DOA :uint8 {
 	DEAD UMETA(DisplayName = "DEAD"),

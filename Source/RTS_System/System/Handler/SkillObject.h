@@ -19,15 +19,10 @@ class RTS_SYSTEM_API USkillObject : public UObject {
 public:
 	USkillObject();
 	virtual void ActiveSkill();
-
-	WEAPONTYPE WeaponType;
-	SKILLTYPE SkillType;
+	virtual void Clone(const USkillObject* From);
 
 	FName Skill_ID;
-	FString SkillName;
-	FString Description;
-	float CoolTime;
-	
-	// Skill external data.
-	SkillVariable* SkillParams;
+
+	// This can't be nullptr.
+	SkillVariable* SkillParams = nullptr;
 };

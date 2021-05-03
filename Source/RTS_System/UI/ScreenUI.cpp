@@ -2,6 +2,7 @@
 
 
 #include "ScreenUI.h"
+#include "QuickSlot.h"
 #include "UMG/Public/Components/GridPanel.h"
 #include "UMG/Public/Blueprint/WidgetTree.h"
 
@@ -27,6 +28,19 @@ void UScreenUI::NativeTick(const FGeometry& MyGeometry, float delta) {
 void UScreenUI::SetSkillPanelVisibility(bool trigger) {
 	if (trigger) 
 		SkillPanel->SetVisibility(ESlateVisibility::Visible);
-	else 
+	else {
 		SkillPanel->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void UScreenUI::UpdateSkillPanel() {
+	for (int idx = 0; idx < 4; idx++) {
+		auto tSlot = SkillPanel->GetChildAt(idx);
+		auto QuickSlot = Cast<UQuickSlot>(tSlot);
+
+		if (IsValid(QuickSlot)) {
+			QuickSlot->UpdateLinkSlot();
+		}
+	}
+
 }

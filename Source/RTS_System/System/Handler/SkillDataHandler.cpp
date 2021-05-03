@@ -40,6 +40,33 @@ void USkillDataHandler::UpdateWeaponSkillSlot(TArray<UWidget*>& Slots, const WEA
 	SetWeaponSkilData(Slots, Target, WeaponType);
 }
 
+void USkillDataHandler::SetWeaponSkilData(TArray<UWidget*>& Slots, const SArray* SkillArray, WEAPONTYPE WeaponType) {
+	if (SkillArray == nullptr) return;
+	
+	for (int idx = 0; idx < Slots.Num(); idx++) {
+		auto slot = Cast<UWeaponSkillSlot>(Slots[idx]);
+
+		if (IsValid(slot)) {
+			if (SkillArray->IsValidIndex(idx)) {
+				slot->CurrentTexture = (*SkillArray)[idx]->SkillParams->ThumbnailTexture;
+				slot->SetThumbnailImage();
+				slot->SkillObject = (*SkillArray)[idx];
+				slot->bAssigned = true;
+				slot->bDragable = true;
+			}
+
+			else {
+				slot->SetDefaultThumbnailImage();
+				slot->bAssigned = false;
+				slot->bDragable = false;
+			}
+		}
+	}
+}
+
+
+///// Private functions. /////
+
 void USkillDataHandler::InitSkillVariable() {
 	TArray<SArray*> SkillIndexMatrix;
 	SkillIndexMatrix.Add(&AxeSkills);
@@ -55,38 +82,12 @@ void USkillDataHandler::InitSkillVariable() {
 			Element->SkillParams->Variable03 = Origin->Variable03;
 			Element->SkillParams->Variable04 = Origin->Variable04;
 			Element->SkillParams->Variable05 = Origin->Variable05;
-			Element->SkillParams->Variable06 = Origin->Variable06;
-			Element->SkillParams->Variable07 = Origin->Variable07;
-			Element->SkillParams->Variable08 = Origin->Variable08;
-			Element->SkillParams->Variable09 = Origin->Variable09;
-			Element->SkillParams->Variable10 = Origin->Variable10;
+			Element->SkillParams->WeaponType = Origin->WeaponType;
+			Element->SkillParams->SkillType = Origin->SkillType;
+			Element->SkillParams->SkillName = Origin->SkillName;
+			Element->SkillParams->Description = Origin->Description;
 			Element->SkillParams->ThumbnailTexture = Origin->ThumbnailTexture;
 		}
 	}
 }
 
-void USkillDataHandler::SetWeaponSkilData(TArray<UWidget*>& Slots, const SArray* SkillArray, WEAPONTYPE WeaponType) {
-	if (SkillArray == nullptr) return;
-	
-	for (int idx = 0; idx < Slots.Num(); idx++) {
-		auto slot = Cast<UWeaponSkillSlot>(Slots[idx]);
-
-		if (IsValid(slot)) {
-			if (SkillArray->IsValidIndex(idx)) {
-				slot->CurrentTexture = (*SkillArray)[idx]->SkillParams->ThumbnailTexture;
-				slot->SetThumbnailImage();
-				slot->WeaponType = WeaponType;
-				slot->SkillObject = (*SkillArray)[idx];
-				slot->bAssigned = true;
-				slot->bDragable = true;
-			}
-
-			else {
-				slot->SetDefaultThumbnailImage();
-				slot->WeaponType = WEAPONTYPE::NONE;
-				slot->bAssigned = false;
-				slot->bDragable = false;
-			}
-		}
-	}
-}

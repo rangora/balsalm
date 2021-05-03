@@ -12,6 +12,8 @@
  */
 
 
+class ABaseMeleeUnit;
+class UGridPanel;
 
 UCLASS()
 class RTS_SYSTEM_API USkillControlUI : public UUserWidget {
@@ -20,8 +22,13 @@ public:
 	USkillControlUI(const FObjectInitializer& Initializer);
 	virtual void NativeConstruct() override;
 
-	void OpenOrClose();
+	// Return true when display skillControlUI.
+	bool OpenOrClose();
 	void UpdateWeaponSkillList();
+	void Clear();
+
+	// Unit sync funcs.
+	void UnitSkillConnector(const ABaseMeleeUnit* pUnit, const bool bOpenUI);
 
 	UPROPERTY()
 		TArray<UUserWidget*> WeaponSlotArray;
@@ -31,4 +38,6 @@ public:
 
 private:
 	void WeaponPanelInit();
+	void GetUnitSkillData(const ABaseMeleeUnit* pUnit, const UGridPanel* SkillPanel);
+	void UpdateUnitSkillData(const ABaseMeleeUnit* pUnit, const UGridPanel* SkillPanel);
 };

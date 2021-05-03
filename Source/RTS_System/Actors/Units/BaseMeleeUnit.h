@@ -10,8 +10,12 @@
 /**
  * 
  */
+
+
 class UMeleeAnimInstance;
 class ABaseEquipment;
+class UArmStatComponent;
+
 
 UCLASS()
 class RTS_SYSTEM_API ABaseMeleeUnit : public AUnit {
@@ -33,6 +37,9 @@ public:
 
 	UPROPERTY()
 		UMeleeAnimInstance* AnimInstance;
+	UPROPERTY()
+		UArmStatComponent* ArmStatComponent;
+
 
 private:
 	FCriticalSection _mutex;

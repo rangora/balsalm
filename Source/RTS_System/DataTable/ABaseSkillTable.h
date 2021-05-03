@@ -18,25 +18,23 @@ struct FSkillVariable : public FTableRowBase {
 	UPROPERTY(EditAnywhere) float Variable03 = 0.f;
 	UPROPERTY(EditAnywhere) float Variable04 = 0.f;
 	UPROPERTY(EditAnywhere) float Variable05 = 0.f;
-	UPROPERTY(EditAnywhere) float Variable06 = 0.f;
-	UPROPERTY(EditAnywhere) float Variable07 = 0.f;
-	UPROPERTY(EditAnywhere) float Variable08 = 0.f;
-	UPROPERTY(EditAnywhere) float Variable09 = 0.f;
-	UPROPERTY(EditAnywhere) float Variable10 = 0.f;
-	UPROPERTY(EditAnywhere) UTexture2D* ThumbnailTexture;
+	UPROPERTY(EditAnywhere) WEAPONTYPE WeaponType;
+	UPROPERTY(EditAnywhere) SKILLTYPE SkillType;
+	UPROPERTY(EditAnywhere) FString SkillName;
+	UPROPERTY(EditAnywhere) FString Description;
+	UPROPERTY(EditAnywhere) UTexture2D* ThumbnailTexture; 
 };
 
 struct SkillVariable {
-	int32 Skill_ID;
+	int32 Skill_ID = -1;
 	float Variable01;
 	float Variable02;
 	float Variable03;
 	float Variable04;
 	float Variable05;
-	float Variable06;
-	float Variable07;
-	float Variable08;
-	float Variable09;
-	float Variable10;
+	WEAPONTYPE WeaponType;
+	SKILLTYPE SkillType;
+	FString SkillName;
+	FString Description;
 	UTexture2D* ThumbnailTexture;
 };

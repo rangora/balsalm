@@ -2,15 +2,13 @@
 
 
 #include "Axe_DualStrike.h"
+#include "Engine/Engine.h"
+
 
 UAxe_DualStrike::UAxe_DualStrike() {
 	Skill_ID = "2";
-	WeaponType = WEAPONTYPE::AXE;
-	SkillType = SKILLTYPE::TARGETINGSKILL;
-	SkillName = "DualStrike";
-	CoolTime = 6.f;
-	Description = "DUAL!!";
 }
 
 void UAxe_DualStrike::ActiveSkill() {
+	GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Green, TEXT("UAxe_DualStrike!!"));
 }
