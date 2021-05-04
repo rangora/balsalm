@@ -121,31 +121,33 @@ void USkillControlUI::UnitSkillConnector(const ABaseMeleeUnit* pUnit, const bool
 	}
 }
 
+void USkillControlUI::ClearUserWeaponSkillSlot() {
+	auto SkillPanel = WidgetTree->FindWidget<UGridPanel>("SkillPanel");
+	auto Slots = SkillPanel->GetAllChildren();
+
+	for (int idx = 1; idx <= UNIT_SKILLSLOT_LENGTH; idx++) {
+		auto wSlot = Cast<UWeaponSkillSlot>(Slots[idx]);
+		wSlot->SkillObject = nullptr;
+		wSlot->SetDefaultThumbnailImage();
+	}
+}
+
 /************************/
 
 
 /* Private functions. */
 
 void USkillControlUI::WeaponPanelInit() {
-	TArray<FString> ThumbnailPaths = {
-	"/Game/Resources/Thumbnail/Skill/axe_thumbnail01.axe_thumbnail01",
-	"/Game/Resources/Thumbnail/Skill/rifle_thumbnail01.rifle_thumbnail01"
-	};
-	TArray<WEAPONTYPE> TypeList = {
-		WEAPONTYPE::AXE,
-		WEAPONTYPE::GUN
-	};
-
 	auto Panel = WidgetTree->FindWidget<UVerticalBox>("WeaponList");
 	auto WeaponArray = Panel->GetAllChildren();
 
-	for (int i = 0; i < ThumbnailPaths.Num(); i++) {
+	for (int i = 0; i < WeaponThumbnailPaths.Num(); i++) {
 		// Add one value due to spacer(padding).
 		auto WeaponSlot = Cast<UWeaponListSlot>(WeaponArray[i+1]);
 		if (IsValid(WeaponSlot)) {
-			WeaponSlot->CurrentTexture = LoadObject<UTexture2D>(NULL, *(ThumbnailPaths[i]), NULL, LOAD_None, NULL);
+			WeaponSlot->CurrentTexture = LoadObject<UTexture2D>(NULL, *(WeaponThumbnailPaths[i]), NULL, LOAD_None, NULL);
 			WeaponSlot->SetThumbnailImage();
-			WeaponSlot->WeaponType = TypeList[i];
+			WeaponSlot->WeaponType = WeaponTypeList[i];
 			WeaponSlot->bAssigned = true;
 			WeaponSlot->bDragable = true;
 			WeaponSlotArray.Add(WeaponSlot);
@@ -157,6 +159,11 @@ void USkillControlUI::GetUnitSkillData(const ABaseMeleeUnit* pUnit, const UGridP
 	TArray<USkillObject*>& UnitSkillObjects = pUnit->ArmStatComponent->SkillArray;
 	auto SkillPanel_Slots = SkillPanel->GetAllChildren();
 	
+	// Weapon sync.
+	auto UI_weaponSlot = Cast<UWeaponListSlot>(SkillPanel_Slots[0]);
+	UI_weaponSlot->SetThisWeapon(pUnit->ArmStatComponent->UnitWeapon);
+
+	// Weapon skill sync.
 	for (int idx = 1; idx <= 4; idx++) {
 		auto UI_SkillSlot = Cast<UWeaponSkillSlot>(SkillPanel_Slots[idx]);
 
@@ -176,6 +183,11 @@ void USkillControlUI::UpdateUnitSkillData(const ABaseMeleeUnit* pUnit, const UGr
 	TArray<USkillObject*>& UnitSkillObjects = pUnit->ArmStatComponent->SkillArray;
 	auto SkillPanel_Slots = SkillPanel->GetAllChildren();
 
+	// Weapon update.
+	auto UI_weaponSlot = Cast<UWeaponListSlot>(SkillPanel_Slots[0]);
+	pUnit->ArmStatComponent->UnitWeapon = UI_weaponSlot->WeaponType;
+
+	// Weapon skill update.
 	for (int idx = 1; idx <= 4; idx++) {
 		auto UI_SkillSlot = Cast<UWeaponSkillSlot>(SkillPanel_Slots[idx]);
 		

@@ -11,13 +11,25 @@
  * 
  */
 
+static const TArray<FString> WeaponThumbnailPaths = {
+	"/Game/Resources/Thumbnail/Skill/axe_thumbnail01.axe_thumbnail01",
+	"/Game/Resources/Thumbnail/Skill/rifle_thumbnail01.rifle_thumbnail01"
+};
+
+static const TArray<WEAPONTYPE> WeaponTypeList = {
+	WEAPONTYPE::AXE,
+	WEAPONTYPE::GUN
+};
+
 
 class ABaseMeleeUnit;
 class UGridPanel;
 
+
 UCLASS()
 class RTS_SYSTEM_API USkillControlUI : public UUserWidget {
 	GENERATED_BODY()
+
 public:
 	USkillControlUI(const FObjectInitializer& Initializer);
 	virtual void NativeConstruct() override;
@@ -29,6 +41,10 @@ public:
 
 	// Unit sync funcs.
 	void UnitSkillConnector(const ABaseMeleeUnit* pUnit, const bool bOpenUI);
+
+	// Clear user weapon skill slots.
+	UFUNCTION()
+		void ClearUserWeaponSkillSlot();
 
 	UPROPERTY()
 		TArray<UUserWidget*> WeaponSlotArray;

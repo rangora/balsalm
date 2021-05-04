@@ -23,15 +23,17 @@ public:
 	AMainController();
 	virtual void SetupInputComponent() override;
 
-	void SetSkillPanelVisibility();
+	void SetSkillPanelVisibility(bool bVisible);
 	void OpenOrCloseSkillPanel();
 
 	UFUNCTION()
 		void ActiveQuickSlot(int32 idx);
 
+	// Called in HUD.
 	UFUNCTION(BlueprintCallable)
 		void SetUnits(TArray<AActor*> pUnits, bool bClicked);
 
+	// Only can store allies units.
 	UPROPERTY(BlueprintReadWrite)
 		TArray<AUnit*> Units;
 

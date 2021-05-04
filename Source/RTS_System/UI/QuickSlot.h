@@ -9,15 +9,15 @@
 /**
  * 
  */
+
+class USkillObject;
+
 UCLASS()
 class RTS_SYSTEM_API UQuickSlot : public UCommonSlot {
 	GENERATED_BODY()
 public:
-	void UpdateLinkSlot();
+	void GetRefSkillObject(USkillObject* sObject);
 
 	UPROPERTY()
-		UWidget* OriginSlot = nullptr;
-
-	UPROPERTY(EditAnywhere)
-		int32 RefIndex;
+		USkillObject* SkillObject = nullptr;
 };

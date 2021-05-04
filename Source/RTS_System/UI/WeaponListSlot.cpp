@@ -8,10 +8,8 @@
 #include "Components/VerticalBox.h"
 #include "Components/Image.h"
 
-void UWeaponListSlot::bBorderImageVisible(bool visibility) {
-	if (visibility)	BorderImage->SetVisibility(ESlateVisibility::Visible);
-	else BorderImage->SetVisibility(ESlateVisibility::Hidden);
-}
+
+/* In-build functions. */
 
 void UWeaponListSlot::NativeConstruct() {
 	Super::NativeConstruct();
@@ -45,6 +43,43 @@ FReply UWeaponListSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, con
 	return reply.NativeReply;
 }
 
+/******************/
+
+
+/* User defined functions. */
+
+void UWeaponListSlot::bBorderImageVisible(bool visibility) {
+	if (visibility)	BorderImage->SetVisibility(ESlateVisibility::Visible);
+	else BorderImage->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UWeaponListSlot::SetThisWeapon(WEAPONTYPE pWeaponType) {
+	WeaponType = pWeaponType;
+	
+	if (WeaponType == WEAPONTYPE::NONE) {
+		SetDefaultThumbnailImage();
+		bAssigned = false;
+	}
+	else {
+		FString TexPath;
+
+		switch (WeaponType) {
+		case WEAPONTYPE::AXE: {
+			TexPath = WeaponThumbnailPaths[WEAPON_INDEX::AXE];
+			break;
+		}
+		case WEAPONTYPE::GUN: {
+			TexPath = WeaponThumbnailPaths[WEAPON_INDEX::GUN];
+			break;
+		}
+		}
+
+		CurrentTexture = LoadObject<UTexture2D>(NULL, *(TexPath), NULL, LOAD_None, NULL);
+		SetThumbnailImage();
+		bAssigned = true;
+	}
+}
+
 void UWeaponListSlot::WidgetLinkOperation() {
 	if (WidgetLink.IsValid()) {
 		auto SkillPanel = Cast<USkillControlUI>(WidgetLink.Get());
@@ -58,13 +93,20 @@ void UWeaponListSlot::WidgetLinkOperation() {
 void UWeaponListSlot::DropAction(const UUserWidget* From) {
 	if (From->IsA(UWeaponListSlot::StaticClass())) {
 		auto FromSlot = Cast<UWeaponListSlot>(From);
-		
+		auto SkillPanel = Cast<USkillControlUI>(WidgetLink.Get());
+
+		// New weanon type..
+		if (WeaponType != FromSlot->WeaponType) {
+			SkillPanel->ClearUserWeaponSkillSlot();
+		}
+
 		// Get ref.
 		CurrentTexture = FromSlot->CurrentTexture;
 		WeaponType = FromSlot->WeaponType;
 		SetThumbnailImage();
-
-		auto SkillPanel = Cast<USkillControlUI>(WidgetLink.Get());
+		
 		SkillPanel->UsedWeapon = WeaponType;
 	}
 }
+
+/****************/

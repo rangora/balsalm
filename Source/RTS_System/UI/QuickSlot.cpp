@@ -8,34 +8,20 @@
 #include "UMG/Public/Components/GridPanel.h"
 #include "UMG/Public/Components/VerticalBox.h"
 #include "../System/Handler/SkillObject.h"
+#include "../ActorType.h"
 
-void UQuickSlot::UpdateLinkSlot() {
-	auto IController = Cast<AMainController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	auto SkillControlPanel = IController->SkillControlUIWidget;
-	auto SkillPanel = SkillControlPanel->WidgetTree->FindWidget<UGridPanel>("SkillPanel");
-	
-	if (IsValid(SkillPanel)) {
-		OriginSlot = SkillPanel->GetChildAt(RefIndex);
 
-		// Origin is a member pointer.
-		if (IsValid(OriginSlot)) {
-			auto LinkedSlot = Cast<UWeaponSkillSlot>(OriginSlot);
 
-			if (IsValid(LinkedSlot)) {
+void UQuickSlot::GetRefSkillObject(USkillObject* sObject) {
+	if (!IsValid(sObject)) return;
 
-				if (LinkedSlot->bAssigned) {
-					GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Red, TEXT("Skill Active!!"));
-					LinkedSlot->SkillObject->ActiveSkill();
-					CurrentTexture = LinkedSlot->CurrentTexture;
-					SetThumbnailImage();
-				}
-				else {
-					SetDefaultThumbnailImage();
-					LinkedSlot->bAssigned = false;
-					OriginSlot = nullptr;
-				}
-			}
-
-		}
+	if (sObject->Skill_ID == EMPTY_SKILL_ID) {
+		SetDefaultThumbnailImage();
+		SkillObject = nullptr;
+	}
+	else {
+		SkillObject = sObject;
+		CurrentTexture = SkillObject->SkillParams->ThumbnailTexture;
+		SetThumbnailImage();
 	}
 }

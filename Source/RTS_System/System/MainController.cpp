@@ -9,7 +9,14 @@
 #include "../UI/ScreenUI.h"
 #include "../UI/SkillControlUI.h"
 #include "../UI/MainHUD.h"
+#include "../UI/QuickSlot.h"
+#include "../System/Handler/SkillObject.h"
+#include "../ActorType.h"
+#include "UMG/Public/Components/GridPanel.h"
 
+
+
+/* In-build functions.*/
 
 AMainController::AMainController() {
 	static ConstructorHelpers::FClassFinder<UUserWidget> SkillControlUI_C(
@@ -30,63 +37,79 @@ void AMainController::SetupInputComponent() {
 	InputComponent->BindAction<FQuickSlotAction>(TEXT("Quick04"), EInputEvent::IE_Pressed, this, &AMainController::ActiveQuickSlot, 4);
 }
 
-void AMainController::SetSkillPanelVisibility() {
+/**********/
+
+
+/* User defined functions. */
+
+void AMainController::SetSkillPanelVisibility(bool bVisible) {
 	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	auto IHUD = this->GetHUD<AMainHUD>();
 	auto pScreenWidget = Cast<UScreenUI>(IHUD->ScreenUIWidget);
 	
-	if (Units.Num() == 1 && 
-		Units[0]->unit_Team_Number == IMode->player_Team_Number) {
+	if (bVisible) {
 		pScreenWidget->SetSkillPanelVisibility(true);
+		pScreenWidget->UpdateSkillSlots(Units[0]);
 	}
-	else pScreenWidget->SetSkillPanelVisibility(false);
+	else {
+		pScreenWidget->SetSkillPanelVisibility(false);
+		pScreenWidget->CleanAllSlots();
+	}
 }
 
 void AMainController::OpenOrCloseSkillPanel() {
 	auto SkillUI = Cast<USkillControlUI>(SkillControlUIWidget);
-	
+	auto MainHUD = Cast<AMainHUD>(GetHUD());
+
 	if (IsOnlyOneAllyUnitSelected()) {
 		auto ControllableUnit = Cast<ABaseMeleeUnit>(Units[0]);
 
 		if (IsValid(ControllableUnit)) {
 			// UI open action.
 			if (SkillUI->OpenOrClose()) {
-				SkillUI->UnitSkillConnector(ControllableUnit, true);
-				
-				//FInputModeGameAndUI Mode;
-				//SetInputMode(Mode);
+				SkillUI->UnitSkillConnector(ControllableUnit, true);				
+				MainHUD->bDragable = false;
 			}
 			// UI close action.
 			else {
 				SkillUI->UnitSkillConnector(ControllableUnit, false);
 				SkillUI->Clear();
-				//FInputModeGameAndUI Mode;
-				//SetInputMode(Mode);
+				MainHUD->bDragable = true;
+
+				auto pScreenWidget = Cast<UScreenUI>(MainHUD->ScreenUIWidget);
+				pScreenWidget->UpdateSkillSlots(Units[0]);
 			}
 		}
 	}
-
-	// When closed..
-	//if (!SkillUI->OpenOrClose()) {
-	//	// Refresh the quickslots.
-	//	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	//	auto IHUD = this->GetHUD<AMainHUD>();
-	//	auto pScreenWidget = Cast<UScreenUI>(IHUD->ScreenUIWidget);
-
-	//	pScreenWidget->UpdateSkillPanel();
-	//}
 }
 
 void AMainController::ActiveQuickSlot(int32 idx) {
 	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	if (Units.Num() == 1 
-		&& Units[0]->unit_Team_Number == IMode->player_Team_Number) {
-		
+	if (IsOnlyOneAllyUnitSelected()) {
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("IsOnlyOneAllyUnitSelected!!"));
 
+		auto MainHUD = Cast<AMainHUD>(GetHUD());
+		auto pScreenWidget = Cast<UScreenUI>(MainHUD->ScreenUIWidget);
+		auto UnitSkillArray = pScreenWidget->SkillPanel->GetAllChildren();
 
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, 
-			FString::Printf(TEXT("AMainController::ActiveQuickSlot_(%d)"), idx));
+		// Zero start index.
+		auto UnitSkillObject = Cast<UQuickSlot>(UnitSkillArray[idx - 1])->SkillObject;
+
+		if (IsValid(UnitSkillObject)) {
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("SKILL!!"));
+			UnitSkillObject->ActiveSkill();
+			
+		}
+
+		/*for (int idx = 0; idx < UNIT_SKILLSLOT_LENGTH; idx++) {
+			
+
+			if (IsValid(UnitSkillObject)) {
+				
+			}
+		}*/
+
 	}
 }
 
@@ -94,6 +117,7 @@ void AMainController::SetUnits(TArray<AActor*> pUnits, bool bClicked=false) {
 	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	AUnit* Foe_Unit=nullptr;
 	int32_t idx = 0;
+	bool bShowSkillPanel = false;
 
 	// Clear the data.
 	for (int i = 0; i < Units.Num(); i++) {
@@ -113,8 +137,7 @@ void AMainController::SetUnits(TArray<AActor*> pUnits, bool bClicked=false) {
 				aUnit->Deco->SelectionMeshRef->SetVisibility(true);
 			}
 			// Foes
-			else 
-				Foe_Unit = aUnit;
+			else Foe_Unit = aUnit;
 		}
 	}
 
@@ -124,10 +147,18 @@ void AMainController::SetUnits(TArray<AActor*> pUnits, bool bClicked=false) {
 		Foe_Unit->Deco->SelectionDynamic->SetVectorParameterValue(TEXT("SelectionColor"), FLinearColor(100.f, 5.f, 0.f));
 		Foe_Unit->Deco->SelectionMeshRef->SetVisibility(true);
 	}
-
+	// Jobs when only one ally unit selected..
+	else if (Units.Num() == 1) 
+		bShowSkillPanel = true;
+	
 	// Check wheater draw ScreenUIWidget or not.
-	SetSkillPanelVisibility();
+	SetSkillPanelVisibility(bShowSkillPanel);
 }
+
+/**************/
+
+
+/* Private functions. */
 
 bool AMainController::IsOnlyOneAllyUnitSelected() {
 	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -138,4 +169,6 @@ bool AMainController::IsOnlyOneAllyUnitSelected() {
 	}
 	return false;
 }
+
+/**************/
 

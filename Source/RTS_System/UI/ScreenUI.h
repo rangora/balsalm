@@ -11,6 +11,8 @@
  */
 
 class UGridPanel;
+class AUnit;
+
 
 UCLASS()
 class RTS_SYSTEM_API UScreenUI : public UUserWidget {
@@ -21,8 +23,10 @@ public:
 	virtual void NativeTick(const FGeometry& MyGeometry, float delta) override;
 	
 	void SetSkillPanelVisibility(bool trigger);
-	void UpdateSkillPanel();
-
+	
+	// Functions which manipulate skill slots.
+	void UpdateSkillSlots(const AUnit* pUnit);
+	void CleanAllSlots();
 
 	UPROPERTY()
 		UGridPanel* SkillPanel;

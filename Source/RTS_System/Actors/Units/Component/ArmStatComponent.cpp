@@ -4,7 +4,6 @@
 #include "ArmStatComponent.h"
 #include "../../../System/Handler/SkillObject.h"
 
-
-void UArmStatComponent::UpdateSkillData() {
-
+UArmStatComponent::UArmStatComponent() {
+	UnitWeapon = WEAPONTYPE::NONE;
 }

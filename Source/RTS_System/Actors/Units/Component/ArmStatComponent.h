@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "../../../ActorType.h"
 #include "ArmStatComponent.generated.h"
 
 /**
@@ -16,9 +17,12 @@ UCLASS()
 class RTS_SYSTEM_API UArmStatComponent : public UObject {
 	GENERATED_BODY()
 public:
+	UArmStatComponent();
 
-	void UpdateSkillData();
-
+	// Skill array initial size is eual to UNIT_SKILLSLOT_LENGTH(4)
+	// and it can't be nullptr.
 	UPROPERTY()
 		TArray<USkillObject*> SkillArray;
+
+	WEAPONTYPE UnitWeapon;
 };

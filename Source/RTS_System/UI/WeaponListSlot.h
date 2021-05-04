@@ -23,6 +23,7 @@ public:
 	virtual void DropAction(const UUserWidget* From) override;
 
 	void bBorderImageVisible(bool visibility);
+	void SetThisWeapon(WEAPONTYPE pWeaponType);
 
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget))
 		UImage* BorderImage;
@@ -30,6 +31,12 @@ public:
 	WEAPONTYPE WeaponType;
 	static UWeaponListSlot* SelectedSlot;
 	
+
+private:
+	enum WEAPON_INDEX {
+		AXE,
+		GUN
+	};
 };
 
 UWeaponListSlot* UWeaponListSlot::SelectedSlot = nullptr;

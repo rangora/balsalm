@@ -2,7 +2,14 @@
 
 
 #include "MainHUD.h"
+#include "ScreenUI.h"
+#include "../ActorType.h"
 #include "../System/MainController.h"
+#include "../System/MainGameMode.h"
+#include "../Actors/Units/Unit.h"
+#include "UMG/Public/Blueprint/WidgetTree.h"
+#include "UMG/Public/Components/GridPanel.h"
+
 
 
 AMainHUD::AMainHUD() {

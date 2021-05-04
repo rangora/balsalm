@@ -12,6 +12,8 @@
  */
 
 class UUserWidget;
+class AUnit;
+
 
 UCLASS()
 class RTS_SYSTEM_API AMainHUD : public AHUD {
@@ -23,9 +25,13 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		bool IsClicked(const FVector2D& lh, const FVector2D& rh);
+		
+
 
 	UPROPERTY()
 		UUserWidget* ScreenUIWidget;
+	UPROPERTY(BlueprintReadWrite)
+		bool bDragable = true;
 
 private:
 	UPROPERTY()
