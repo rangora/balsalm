@@ -11,6 +11,7 @@
 #include "../UI/MainHUD.h"
 #include "../UI/QuickSlot.h"
 #include "../System/Handler/SkillObject.h"
+#include "../System/Handler/AllSkill.h"
 #include "../ActorType.h"
 #include "UMG/Public/Components/GridPanel.h"
 
@@ -87,7 +88,6 @@ void AMainController::ActiveQuickSlot(int32 idx) {
 	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	if (IsOnlyOneAllyUnitSelected()) {
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("IsOnlyOneAllyUnitSelected!!"));
 
 		auto MainHUD = Cast<AMainHUD>(GetHUD());
 		auto pScreenWidget = Cast<UScreenUI>(MainHUD->ScreenUIWidget);
@@ -97,19 +97,9 @@ void AMainController::ActiveQuickSlot(int32 idx) {
 		auto UnitSkillObject = Cast<UQuickSlot>(UnitSkillArray[idx - 1])->SkillObject;
 
 		if (IsValid(UnitSkillObject)) {
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("SKILL!!"));
-			UnitSkillObject->ActiveSkill();
-			
+			auto UnitAnimInstance = Units[0]->GetMesh()->GetAnimInstance();
+			UnitSkillObject->ActiveSkill(Units[0]);
 		}
-
-		/*for (int idx = 0; idx < UNIT_SKILLSLOT_LENGTH; idx++) {
-			
-
-			if (IsValid(UnitSkillObject)) {
-				
-			}
-		}*/
-
 	}
 }
 

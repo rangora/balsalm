@@ -14,5 +14,5 @@ class RTS_SYSTEM_API UAxe_DualStrike : public USkillObject {
 	GENERATED_BODY()
 public:
 	UAxe_DualStrike();
-	void virtual ActiveSkill() override;
+	void virtual ActiveSkill(AUnit* pUnit) override;
 };

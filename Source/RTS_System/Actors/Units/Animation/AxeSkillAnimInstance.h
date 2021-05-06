@@ -10,6 +10,8 @@
 /**
  * 
  */
+
+
 UCLASS()
 class RTS_SYSTEM_API UAxeSkillAnimInstance : public UBaseSkillAnimInstance {
 	GENERATED_BODY()
@@ -18,6 +20,9 @@ public:
 
 	void PlaySkullCrack();
 	void PlayCycloneAxe();
+
+	UFUNCTION()
+		void AnimNotify_SkillEnd();
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AxeSkill)

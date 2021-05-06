@@ -41,7 +41,6 @@ void UScreenUI::UpdateSkillSlots(const AUnit* pUnit) {
 	TArray<USkillObject*>& UnitSkillArray = AllyUnit->ArmStatComponent->SkillArray;
 	auto SkillPanelSlots = SkillPanel->GetAllChildren();
 
-
 	for (int idx = 0; idx < UNIT_SKILLSLOT_LENGTH; idx++) {
 		auto PanelSlot = Cast<UQuickSlot>(SkillPanelSlots[idx]);
 		auto UnitSkillObject = UnitSkillArray[idx];

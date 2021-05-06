@@ -14,5 +14,5 @@ class RTS_SYSTEM_API UGun_CripplingShot : public USkillObject {
 	GENERATED_BODY()
 public:
 	UGun_CripplingShot();
-	void virtual ActiveSkill() override;
+	void virtual ActiveSkill(AUnit* pUnit) override;
 };

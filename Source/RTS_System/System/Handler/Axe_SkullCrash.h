@@ -2,17 +2,27 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Engine.h"
 #include "SkillObject.h"
+#include "Templates/SubclassOf.h"
 #include "Axe_SkullCrash.generated.h"
 
 /**
  * 
  */
+
+class UAxeSkillAnimInstance;
+
+
 UCLASS()
 class RTS_SYSTEM_API UAxe_SkullCrash : public USkillObject {
 	GENERATED_BODY()
 public:
 	UAxe_SkullCrash();
-	void virtual ActiveSkill() override;
+	void virtual ActiveSkill(AUnit* pUnit) override;
+
+	UPROPERTY()
+		UAxeSkillAnimInstance* AxeSkillAnimInstance;
+	UPROPERTY()
+		TSubclassOf<UAnimInstance> AxeSkillAnimInstanceClass;
 };

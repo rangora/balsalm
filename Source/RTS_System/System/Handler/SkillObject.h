@@ -12,14 +12,15 @@
  */
 
 struct SkillVariable;
+class UAnimInstance;
+class AUnit;
 
 UCLASS()
 class RTS_SYSTEM_API USkillObject : public UObject {
 	GENERATED_BODY()
 public:
 	USkillObject();
-	virtual void ActiveSkill();
-	virtual void Clone(const USkillObject* From);
+	virtual void ActiveSkill(AUnit* pUnit);
 
 	FName Skill_ID;
 

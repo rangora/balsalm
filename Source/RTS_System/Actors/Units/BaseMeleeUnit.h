@@ -28,18 +28,26 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual void Interaction_Implementation(const FVector& RB_Vector, AActor* Target);
 
-	//void AttackCheck();
-	//void TakeDamage(float amount);
 	void BasicAttack();
 	void BasicAttackEnd();
+
+	UFUNCTION()
+		void SetBasicAnimInstance();
 
 	void EquipmentMount(ABaseEquipment* Item);
 
 	UPROPERTY()
+		TSubclassOf<UAnimInstance> BasicUnitAnimInstanceClass;
+	UPROPERTY() 
 		UMeleeAnimInstance* AnimInstance;
 	UPROPERTY()
 		UArmStatComponent* ArmStatComponent;
 
+	UPROPERTY(EditAnywhere)
+		UDecalComponent* DecalSkillRange;
+
+	bool bGoBasicAnimInstance = false;
+	bool bMovable = true;
 
 private:
 	FCriticalSection _mutex;

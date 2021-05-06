@@ -9,24 +9,44 @@
 #include "../../ActorType.h"
 #include "../../System/MainGameMode.h"
 #include "../../System/Handler/SkillObject.h"
-//#include "../../UI/SkillControlUI.h"
+
 
 
 ABaseMeleeUnit::ABaseMeleeUnit() : bReadyBasicAttack(false) {
-	ArmStatComponent = NewObject<UArmStatComponent>();
+	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_Basic(
+		TEXT("/Game/Mannequin/Animations/ANIM_UnitGraph.ANIM_UnitGraph_C"));
+	
+	// Skill range dacal init. (test)
+	DecalSkillRange = CreateDefaultSubobject<UDecalComponent>(TEXT("DecalSkillRange"));
+	DecalSkillRange->SetupAttachment(GetMesh());
 
-	for (int i = 0; i < UNIT_SKILLSLOT_LENGTH; i++)
-		ArmStatComponent->SkillArray.Add(NewObject<USkillObject>());
+	static ConstructorHelpers::FObjectFinder<UMaterial> MAT_SkillRangeDecal(
+		TEXT("/Game/Resources/Circle/MAT_DecalCircle.MAT_DecalCircle"));
+
+	if (MAT_SkillRangeDecal.Succeeded()) {
+		UMaterialInterface* RangeMaterial = MAT_SkillRangeDecal.Object;
+		DecalSkillRange->SetDecalMaterial(RangeMaterial);
+	}
+
+	if (ANIM_Basic.Succeeded())
+		BasicUnitAnimInstanceClass = ANIM_Basic.Class;
 }
 
 void ABaseMeleeUnit::Tick(float delta) {
 	Super::Tick(delta);
 
 	if (bReadyBasicAttack) BasicAttack();
+	if (bGoBasicAnimInstance) SetBasicAnimInstance();
 }
 
 void ABaseMeleeUnit::BeginPlay() {
 	Super::BeginPlay();
+
+	// ArmStatComponent init.
+	this->ArmStatComponent = NewObject<UArmStatComponent>();
+
+	for (int i = 0; i < UNIT_SKILLSLOT_LENGTH; i++)
+		this->ArmStatComponent->SkillArray.Add(NewObject<USkillObject>());
 
 	FName WeaponSocket(TEXT("R_Hand_Socket"));
 	FString SampleWeaponPath = "/Game/Blueprints/Actors/Equipment/BP_SampleAxe.BP_SampleAxe_C";
@@ -50,24 +70,26 @@ void ABaseMeleeUnit::PostInitializeComponents() {
 void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor* Target) {
 	Super::Interaction_Implementation(RB_Vector, Target);
 
-	bReadyBasicAttack = false;
-
+	// Check whether unit is a ally or not.
 	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IMode == nullptr || (IMode->player_Team_Number != unit_Team_Number)) return;
 	
-	auto TUnit = Cast<AUnit>(Target);
+	bReadyBasicAttack = false;
 
-	if (AnimInstance->IsAnyMontagePlaying()) 
-		AnimInstance->StopAllMontages(0.5f);
+	auto DesiredTargetUnit = Cast<AUnit>(Target);
+
+	// Stop current animation.
+	if (AnimInstance->IsAnyMontagePlaying())
+		AnimInstance->StopAllMontages(0.35f);
 
 	Astar->MoveToLocation(RB_Vector);
 
-	if (!IsValid(TUnit)) return;
+	if (!IsValid(DesiredTargetUnit)) return;
 
-	if (TUnit->IsPendingKill() || (TUnit->UnitStat->DeadOrAlive == DOA::DEAD)) return;
+	if (DesiredTargetUnit->IsPendingKill() || (DesiredTargetUnit->UnitStat->DeadOrAlive == DOA::DEAD)) return;
 
-	if (IMode->player_Team_Number != TUnit->unit_Team_Number) {
-		TargetUnit = TUnit;
+	if (IMode->player_Team_Number != DesiredTargetUnit->unit_Team_Number) {
+		TargetUnit = DesiredTargetUnit;
 		bReadyBasicAttack = true;
 	}
 }
@@ -83,16 +105,29 @@ void ABaseMeleeUnit::BasicAttack() {
 	_mutex.Unlock();
 
 	float distance = FVector::Distance(TargetLocation, GetActorLocation());
-	UE_LOG(LogTemp, Log, TEXT("distance:%f"), distance);
-
+	
 	if (distance > 0 && distance <= UnitStat->attackRange) {
 		AnimInstance->PlayBasicAttack();
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("Attack!")));
 		bReadyBasicAttack = false;
 	}
 }
 
 void ABaseMeleeUnit::BasicAttackEnd() {}
+
+void ABaseMeleeUnit::SetBasicAnimInstance() {
+	auto CurrentAnimInstance = GetMesh()->GetAnimInstance();
+
+	CurrentAnimInstance->StopAllMontages(0.f);
+	
+	const bool bBlockOnTask = true;
+	const bool bPerformPostAnimEvaluation = true;
+
+	GetMesh()->HandleExistingParallelEvaluationTask(bBlockOnTask, bPerformPostAnimEvaluation);
+	
+	GetMesh()->SetAnimInstanceClass(BasicUnitAnimInstanceClass);
+	AnimInstance = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
+	bGoBasicAnimInstance = false;
+}
 
 void ABaseMeleeUnit::EquipmentMount(ABaseEquipment* Item) {
 	switch (Item->ItemType) {

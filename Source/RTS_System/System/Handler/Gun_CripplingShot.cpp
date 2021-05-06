@@ -7,5 +7,5 @@ UGun_CripplingShot::UGun_CripplingShot() {
 	Skill_ID = "3";
 }
 
-void UGun_CripplingShot::ActiveSkill() {
+void UGun_CripplingShot::ActiveSkill(AUnit* pUnit) {
 }

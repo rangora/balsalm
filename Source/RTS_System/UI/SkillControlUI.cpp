@@ -194,7 +194,7 @@ void USkillControlUI::UpdateUnitSkillData(const ABaseMeleeUnit* pUnit, const UGr
 		
 		if (IsValid(UI_SkillSlot)) {
 			if (UI_SkillSlot->SkillObject!=nullptr) {
-				UnitSkillObjects[idx - 1]->Clone(UI_SkillSlot->SkillObject);
+				UnitSkillObjects[idx-1] = UI_SkillSlot->SkillObject;
 			}
 			else {
 				UnitSkillObjects[idx - 1]->Skill_ID = EMPTY_SKILL_ID;
