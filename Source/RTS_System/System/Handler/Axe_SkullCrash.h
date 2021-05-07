@@ -19,10 +19,15 @@ class RTS_SYSTEM_API UAxe_SkullCrash : public USkillObject {
 	GENERATED_BODY()
 public:
 	UAxe_SkullCrash();
+	
+	void CheckSkillRange(ABaseMeleeUnit* pUnit);
 	void virtual ActiveSkill(AUnit* pUnit) override;
+	void SkillAction(ABaseMeleeUnit* pUnit) override;
 
 	UPROPERTY()
 		UAxeSkillAnimInstance* AxeSkillAnimInstance;
 	UPROPERTY()
 		TSubclassOf<UAnimInstance> AxeSkillAnimInstanceClass;
+
+	
 };

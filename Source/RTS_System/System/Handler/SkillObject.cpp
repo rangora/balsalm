@@ -13,3 +13,5 @@ USkillObject::USkillObject() {
 }
 
 void USkillObject::ActiveSkill(AUnit* pUnit) {}
+
+void USkillObject::SkillAction(ABaseMeleeUnit* pUnit) {}

@@ -14,6 +14,8 @@
 struct SkillVariable;
 class UAnimInstance;
 class AUnit;
+class ABaseMeleeUnit;
+
 
 UCLASS()
 class RTS_SYSTEM_API USkillObject : public UObject {
@@ -21,9 +23,12 @@ class RTS_SYSTEM_API USkillObject : public UObject {
 public:
 	USkillObject();
 	virtual void ActiveSkill(AUnit* pUnit);
+	virtual void SkillAction(ABaseMeleeUnit* pUnit);
 
 	FName Skill_ID;
 
 	// This can't be nullptr.
 	SkillVariable* SkillParams = nullptr;
+
+	
 };

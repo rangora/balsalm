@@ -2,7 +2,7 @@
 
 
 #include "MeleeAnimInstance.h"
-#include "../Unit.h"
+#include "../BaseMeleeUnit.h"
 
 
 UMeleeAnimInstance::UMeleeAnimInstance() {
@@ -22,4 +22,10 @@ void UMeleeAnimInstance::AnimNotify_AttackHit() {
 	if (!IsValid(IUnit)) return;
 	if (DeleFunc_AttackCheck.IsBound())
 		DeleFunc_AttackCheck.Broadcast();
+}
+
+void UMeleeAnimInstance::AnimNotify_AttackEnd() {
+	auto IUnit = Cast<ABaseMeleeUnit>(GetOwningActor());
+	if (IsValid(IUnit)) 
+		IUnit->TurnOffBehavior(UNIT_BEHAVIOR::ATTACKING);
 }

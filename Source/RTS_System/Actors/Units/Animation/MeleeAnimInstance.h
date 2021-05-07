@@ -23,6 +23,8 @@ public:
 
 	UFUNCTION()
 		void AnimNotify_AttackHit();
+	UFUNCTION()
+		void AnimNotify_AttackEnd();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attack)
 		UAnimMontage* BasicAttackMontage;
