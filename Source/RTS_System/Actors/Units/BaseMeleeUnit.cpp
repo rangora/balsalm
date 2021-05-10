@@ -2,13 +2,16 @@
 
 
 #include "BaseMeleeUnit.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Component/StatComponent.h"
 #include "Component/AstarComponent.h"
 #include "Component/ArmStatComponent.h"
 #include "Animation/MeleeAnimInstance.h"
 #include "../../ActorType.h"
 #include "../../System/MainGameMode.h"
+#include "../../System/MainController.h"
 #include "../../System/Handler/SkillObject.h"
+#include "../../UI/MainHUD.h"
 
 
 
@@ -34,7 +37,7 @@ ABaseMeleeUnit::ABaseMeleeUnit() : skillRadius(0.f) {
 
 	// Basic anim init.
 	if (ANIM_Basic.Succeeded())
-		BasicUnitAnimInstanceClass = ANIM_Basic.Class;
+		DefaultAnimInstaceClass = ANIM_Basic.Class;
 
 	Behavior = UNIT_BEHAVIOR::MOVABLE;
 }
@@ -44,7 +47,7 @@ void ABaseMeleeUnit::Tick(float delta) {
 
 	if (CheckBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER)) BasicAttack();
 	if (bGoBasicAnimInstance) SetBasicAnimInstance();
-	if (bForSkill) SkillActivator();
+	if (CheckBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER)) SkillActivator();
 }
 
 void ABaseMeleeUnit::BeginPlay() {
@@ -70,9 +73,10 @@ void ABaseMeleeUnit::BeginPlay() {
 
 void ABaseMeleeUnit::PostInitializeComponents() {
 	Super::PostInitializeComponents();
-
+	
+	// test 
+	GetMesh()->SetAnimInstanceClass(DefaultAnimInstaceClass);
 	AnimInstance = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
-	AnimInstance->DeleFunc_AttackCheck.AddUObject(this, &AUnit::AttackCheck);
 }
 
 void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor* Target) {
@@ -87,7 +91,7 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 		// Cancel skill targeting process.
 		if (CheckBehavior(UNIT_BEHAVIOR::SKILL_TARGETING)) {
 			TurnOffBehavior(UNIT_BEHAVIOR::SKILL_TARGETING);
-			DecalSkillRange->SetVisibility(false);
+			ShowSkillRadius(false);
 		}
 
 		// Cancel basic attack animation for movement.
@@ -136,6 +140,9 @@ void ABaseMeleeUnit::BasicAttack() {
 	float distance = FVector::Distance(TargetLocation, GetActorLocation());
 	
 	if (distance > 0 && distance <= UnitStat->attackRange) {
+		auto DesiredRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetUnit->GetActorLocation());
+		SetActorRotation(DesiredRotation);
+
 		AnimInstance->PlayBasicAttack();
 		TurnOffBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER);
 		TurnOnBehavior(UNIT_BEHAVIOR::ATTACKING);
@@ -153,32 +160,22 @@ void ABaseMeleeUnit::AppointTheSkillTarget(float skillRange, USkillObject* Activ
 
 	skillRadius = skillRange;
 	SkillRef = ActivatedSkill;
-	DecalSkillRange->SetVisibility(true);
+	ShowSkillRadius(true);
+	RequiredTargeting();
 	TurnOnBehavior(UNIT_BEHAVIOR::SKILL_TARGETING);
 }
 
 void ABaseMeleeUnit::SkillActivator() {
-	FHitResult RayCastingResult;
-	FVector TargetLocation;
-
-	_mutex.Lock();
-	if (TargetUnit->UnitStat->DeadOrAlive == DOA::ALIVE) {
-		TargetLocation = TargetUnit->GetActorLocation();
-	}
-	_mutex.Unlock();
-
-	float distance = FVector::Distance(TargetLocation, GetActorLocation());
+	float distance = FVector::Distance(TargetUnit->GetActorLocation(), GetActorLocation());
 
 	if (distance > 0 && distance <= DecalSkillRange->DecalSize.Y) {
 		if (IsValid(SkillRef)) {
 			SkillRef->SkillAction(this);
 			AnimInstance->PlayBasicAttack();
-			bForSkill = false;
+			TurnOffBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER);
+			TurnOnBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE);
 		}
 	}
-}
-
-void ABaseMeleeUnit::SetDefaultBehavior() {
 }
 
 bool ABaseMeleeUnit::CheckBehavior(UNIT_BEHAVIOR var) {
@@ -198,6 +195,25 @@ void ABaseMeleeUnit::TurnOffBehavior(UNIT_BEHAVIOR var) {
 	Behavior = static_cast<UNIT_BEHAVIOR>(newBehavior);
 }
 
+void ABaseMeleeUnit::ShowSkillRadius(bool bShow) {
+	DecalSkillRange->SetVisibility(bShow);
+}
+
+void ABaseMeleeUnit::SkillTargetingFinish() {
+	TurnOnBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER);
+	TurnOffBehavior(UNIT_BEHAVIOR::SKILL_TARGETING);
+
+	// Move to location.
+	FVector TargetLocation;
+	_mutex.Lock();
+	if (TargetUnit->UnitStat->DeadOrAlive == DOA::ALIVE) {
+		TargetLocation = TargetUnit->GetActorLocation();
+	}
+	_mutex.Unlock();
+
+	Astar->MoveToLocation(TargetLocation);
+}
+
 void ABaseMeleeUnit::SetBasicAnimInstance() {
 	auto CurrentAnimInstance = GetMesh()->GetAnimInstance();
 
@@ -206,9 +222,10 @@ void ABaseMeleeUnit::SetBasicAnimInstance() {
 	const bool bBlockOnTask = true;
 	const bool bPerformPostAnimEvaluation = true;
 
-	GetMesh()->HandleExistingParallelEvaluationTask(bBlockOnTask, bPerformPostAnimEvaluation);
+	GetMesh()->HandleExistingParallelEvaluationTask(bBlockOnTask, bPerformPostAnimEvaluation);	
 	
-	GetMesh()->SetAnimInstanceClass(BasicUnitAnimInstanceClass);
+	
+	GetMesh()->SetAnimInstanceClass(DefaultAnimInstaceClass);
 	AnimInstance = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
 	bGoBasicAnimInstance = false;
 }
@@ -232,5 +249,14 @@ void ABaseMeleeUnit::EquipmentMount(ABaseEquipment* Item) {
 	
 	default:
 		break;
+	}
+}
+
+void ABaseMeleeUnit::RequiredTargeting() {
+	auto IController = Cast<AMainController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	auto IHUD = Cast<AMainHUD>(IController->GetHUD());
+
+	if (IsValid(IHUD)) {
+		IHUD->MouseLeftButtonActionSwitcher();
 	}
 }

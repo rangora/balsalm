@@ -17,6 +17,9 @@ class AUnit;
 class ABaseMeleeUnit;
 
 
+DECLARE_DELEGATE(FSkillCoolTimeAction);
+
+
 UCLASS()
 class RTS_SYSTEM_API USkillObject : public UObject {
 	GENERATED_BODY()
@@ -30,5 +33,5 @@ public:
 	// This can't be nullptr.
 	SkillVariable* SkillParams = nullptr;
 
-	
+	FSkillCoolTimeAction SkillCoolTimeAction;
 };

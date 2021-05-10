@@ -26,14 +26,23 @@ public:
 	UFUNCTION(BlueprintCallable)
 		bool IsClicked(const FVector2D& lh, const FVector2D& rh);
 		
+	UFUNCTION(BlueprintCallable)
+		void MouseLeftButtonActionSwitcher();
 
+	void SetDragable(bool bDrag);
 
 	UPROPERTY()
 		UUserWidget* ScreenUIWidget;
-	UPROPERTY(BlueprintReadWrite)
-		bool bDragable = true;
 
 private:
 	UPROPERTY()
 		TSubclassOf<UUserWidget> ScreenUIClass;
+
+	FCriticalSection _mutex;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+		bool bDragable = true;
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+		bool bTargeting = false;
+
 };

@@ -23,6 +23,8 @@ enum class UNIT_BEHAVIOR {
 	BASICATTACK_ORDER,
 	ATTACKING,
 	SKILL_TARGETING,
+	SKILL_ACTIVE_ORDER,
+	SKILL_ACTIVE,
 };
 
 
@@ -42,15 +44,19 @@ public:
 	void BasicAttack();
 	void BasicAttackEnd();
 
-	// Skill system.
+	/* Skill system. */
 	void AppointTheSkillTarget(float skillRange, USkillObject* ActivatedSkill);
 	void SkillActivator();
 
 	// Behavior controller.
-	void SetDefaultBehavior();
 	bool CheckBehavior(UNIT_BEHAVIOR var);
 	void TurnOnBehavior(UNIT_BEHAVIOR var);
 	void TurnOffBehavior(UNIT_BEHAVIOR var);
+	
+	UFUNCTION(BlueprintCallable)
+		void ShowSkillRadius(bool bShow);
+	UFUNCTION(BlueprintCallable)
+		void SkillTargetingFinish();
 
 	UFUNCTION()
 		void SetBasicAnimInstance();
@@ -58,8 +64,10 @@ public:
 	void EquipmentMount(ABaseEquipment* Item);
 
 	UPROPERTY()
-		TSubclassOf<UAnimInstance> BasicUnitAnimInstanceClass;
-	UPROPERTY() 
+		TSubclassOf<UMeleeAnimInstance> DefaultAnimInstaceClass;
+	UPROPERTY()
+		UMeleeAnimInstance* DefaultAnimInstance;
+	UPROPERTY(EditAnywhere) 
 		UMeleeAnimInstance* AnimInstance;
 	UPROPERTY()
 		UArmStatComponent* ArmStatComponent;
@@ -74,10 +82,13 @@ public:
 
 	float skillRadius;
 	bool bGoBasicAnimInstance = false;
-	bool bMovable = true;
-	bool bForSkill = false;
+	//bool bMovable = true;
+	//bool bForSkill = false;
 
 private:
+	// Get target info from mainHUD.
+	void RequiredTargeting();
+
 	FCriticalSection _mutex;
 	UNIT_BEHAVIOR Behavior;
 };

@@ -57,6 +57,12 @@ float AUnit::TakeDamage(float damageAmount, FDamageEvent const& DamageEvent, ACo
 	float totalDamage = Super::TakeDamage(damageAmount, DamageEvent, EventInstigator, Causer);
 	
 	UnitStat->TakeDamage(totalDamage);
+
+	// debug
+	float am =UnitStat->currentHP;
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, 
+		FString::Printf(TEXT("am:%f"),am));
+
 	return totalDamage;
 }
 
@@ -64,9 +70,16 @@ void AUnit::Interaction_Implementation(const FVector& RB_Vector, AActor* Target)
 
 void AUnit::AttackCheck() {
 	if (IsValid(TargetUnit)) {
-		UE_LOG(LogTemp, Log, TEXT("AttackCheck!"));
 		float amount = UAttackCaculator::CaculateDamage(this, TargetUnit);
 		FDamageEvent DamageEvent;
 		TargetUnit->TakeDamage(amount, DamageEvent, GetController(), this);
 	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("UNVALID own targetunit!!"));
+	}
+}
+
+void AUnit::SetTargetUnit(AUnit* pUnit) {
+	if (IsValid(pUnit))
+		TargetUnit = pUnit;
 }

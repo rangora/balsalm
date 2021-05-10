@@ -18,10 +18,9 @@ void UMeleeAnimInstance::PlayBasicAttack() {
 }
 
 void UMeleeAnimInstance::AnimNotify_AttackHit() {
-	auto IUnit = Cast<AUnit>(GetOwningActor());
-	if (!IsValid(IUnit)) return;
-	if (DeleFunc_AttackCheck.IsBound())
-		DeleFunc_AttackCheck.Broadcast();
+	auto IUnit = Cast<ABaseMeleeUnit>(GetOwningActor());
+	if (IsValid(IUnit)) 
+		IUnit->AttackCheck();
 }
 
 void UMeleeAnimInstance::AnimNotify_AttackEnd() {

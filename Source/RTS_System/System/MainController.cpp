@@ -69,13 +69,13 @@ void AMainController::OpenOrCloseSkillPanel() {
 			// UI open action.
 			if (SkillUI->OpenOrClose()) {
 				SkillUI->UnitSkillConnector(ControllableUnit, true);				
-				MainHUD->bDragable = false;
+				MainHUD->SetDragable(false);
 			}
 			// UI close action.
 			else {
 				SkillUI->UnitSkillConnector(ControllableUnit, false);
 				SkillUI->Clear();
-				MainHUD->bDragable = true;
+				MainHUD->SetDragable(true);
 
 				auto pScreenWidget = Cast<UScreenUI>(MainHUD->ScreenUIWidget);
 				pScreenWidget->UpdateSkillSlots(Units[0]);
@@ -93,12 +93,19 @@ void AMainController::ActiveQuickSlot(int32 idx) {
 		auto pScreenWidget = Cast<UScreenUI>(MainHUD->ScreenUIWidget);
 		auto UnitSkillArray = pScreenWidget->SkillPanel->GetAllChildren();
 
-		// Zero start index.
-		auto UnitSkillObject = Cast<UQuickSlot>(UnitSkillArray[idx - 1])->SkillObject;
+		// Quickslot start zero index.
+		auto InputedQuickSlot = Cast<UQuickSlot>(UnitSkillArray[idx - 1]);
 
-		if (IsValid(UnitSkillObject)) {
-			auto UnitAnimInstance = Units[0]->GetMesh()->GetAnimInstance();
-			UnitSkillObject->ActiveSkill(Units[0]);
+		if (IsValid(InputedQuickSlot)) {
+			// Cooldowning..
+			if (InputedQuickSlot->bCooldown) return;
+
+			auto UnitSkillObject = Cast<UQuickSlot>(UnitSkillArray[idx - 1])->SkillObject;
+
+			if (IsValid(UnitSkillObject)) {
+				auto UnitAnimInstance = Units[0]->GetMesh()->GetAnimInstance();
+				UnitSkillObject->ActiveSkill(Units[0]);
+			}
 		}
 	}
 }

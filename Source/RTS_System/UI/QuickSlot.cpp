@@ -18,10 +18,16 @@ void UQuickSlot::GetRefSkillObject(USkillObject* sObject) {
 	if (sObject->Skill_ID == EMPTY_SKILL_ID) {
 		SetDefaultThumbnailImage();
 		SkillObject = nullptr;
+		cooldownMax = 0.f;
+		sObject->SkillCoolTimeAction.Unbind();
 	}
 	else {
 		SkillObject = sObject;
 		CurrentTexture = SkillObject->SkillParams->ThumbnailTexture;
+		cooldownMax = SkillObject->SkillParams->Variable05;
+
+		sObject->SkillCoolTimeAction.BindUFunction(this, FName("ActiveCooldown"));
+
 		SetThumbnailImage();
 	}
 }
