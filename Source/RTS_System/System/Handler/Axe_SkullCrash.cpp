@@ -42,7 +42,12 @@ void UAxe_SkullCrash::SkillAction(ABaseMeleeUnit* pUnit) {
 	auto AxeAnim = Cast<UAxeSkillAnimInstance>(pAnim);
 
 	if (IsValid(AxeAnim)) {
-		GEngine->AddOnScreenDebugMessage(-1,4.f,FColor::Green, TEXT("UAxe_SkullCrash!!"));
-		AxeAnim->PlaySkullCrack();
+		if (SkillCoolTimeAction.IsBound()) {
+			SkillCoolTimeAction.Execute();
+			pUnit->TurnOffBehavior(UNIT_BEHAVIOR::MOVABLE);
+			AxeAnim->PlaySkullCrack();
+		}
+		else 
+			GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Red, TEXT("SkillCoolTimeAction unbind"));
 	}
 }

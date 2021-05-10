@@ -32,6 +32,9 @@ public:
 
 	virtual void AttackCheck();
 
+	// For external bluerpint.
+	UFUNCTION(BlueprintCallable)
+		void SetTargetUnit(AUnit* pUnit);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int unit_Team_Number;

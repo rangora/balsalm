@@ -10,7 +10,7 @@
  * 
  */
 
-DECLARE_MULTICAST_DELEGATE(FDele_AttackCheck);
+
 
 UCLASS()
 class RTS_SYSTEM_API UMeleeAnimInstance : public UUnitAnimInstance {
@@ -28,6 +28,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Attack)
 		UAnimMontage* BasicAttackMontage;
-
-	FDele_AttackCheck DeleFunc_AttackCheck;
 };

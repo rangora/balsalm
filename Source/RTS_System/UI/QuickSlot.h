@@ -18,6 +18,19 @@ class RTS_SYSTEM_API UQuickSlot : public UCommonSlot {
 public:
 	void GetRefSkillObject(USkillObject* sObject);
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void ActiveCooldown();
+
+	UPROPERTY(EditAnywhere, BlueprintReadwrite, meta = (BindWidget))
+		UImage* Cooldown;
+
 	UPROPERTY()
 		USkillObject* SkillObject = nullptr;
+
+	UPROPERTY(BlueprintReadwrite)
+		float cooldownMax;
+	UPROPERTY(BlueprintReadwrite)
+		float currentCooldown;
+	UPROPERTY(BlueprintReadwrite)
+		bool bCooldown;
 };

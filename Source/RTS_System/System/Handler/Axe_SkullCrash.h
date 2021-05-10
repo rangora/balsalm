@@ -14,6 +14,7 @@
 class UAxeSkillAnimInstance;
 
 
+
 UCLASS()
 class RTS_SYSTEM_API UAxe_SkullCrash : public USkillObject {
 	GENERATED_BODY()
@@ -28,6 +29,4 @@ public:
 		UAxeSkillAnimInstance* AxeSkillAnimInstance;
 	UPROPERTY()
 		TSubclassOf<UAnimInstance> AxeSkillAnimInstanceClass;
-
-	
 };

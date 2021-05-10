@@ -20,7 +20,7 @@ UAxeSkillAnimInstance::UAxeSkillAnimInstance() {
 }
 
 void UAxeSkillAnimInstance::PlaySkullCrack() {
-	Montage_Play(SkullCrackMontage, 1.f);
+	Montage_Play(SkullCrackMontage, 2.5f);
 }
 
 void UAxeSkillAnimInstance::PlayCycloneAxe() {
@@ -30,6 +30,9 @@ void UAxeSkillAnimInstance::PlayCycloneAxe() {
 void UAxeSkillAnimInstance::AnimNotify_SkillEnd() {
 	auto aUnit = Cast<ABaseMeleeUnit>(GetOwningActor());
 
-	if (IsValid(aUnit)) 
+	if (IsValid(aUnit)) {
 		aUnit->bGoBasicAnimInstance = true;
+		aUnit->TurnOffBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE);
+		aUnit->TurnOnBehavior(UNIT_BEHAVIOR::MOVABLE);
+	}
 }
