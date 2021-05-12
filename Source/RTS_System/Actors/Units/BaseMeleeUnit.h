@@ -41,6 +41,7 @@ public:
 	// Mouse right button action.
 	virtual void Interaction_Implementation(const FVector& RB_Vector, AActor* Target);
 
+	void StopMovement();
 	void BasicAttack();
 	void BasicAttackEnd();
 
@@ -48,6 +49,8 @@ public:
 	void AppointTheSkillTarget(float skillRange, USkillObject* ActivatedSkill);
 	void SkillActivator();
 	void GetHitLocation(FVector& Result);
+
+
 
 	// Behavior controller.
 	bool CheckBehavior(UNIT_BEHAVIOR var);

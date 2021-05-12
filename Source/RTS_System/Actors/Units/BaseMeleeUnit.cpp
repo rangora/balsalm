@@ -61,7 +61,7 @@ void ABaseMeleeUnit::BeginPlay() {
 		this->ArmStatComponent->SkillArray.Add(NewObject<USkillObject>());
 
 	FName WeaponSocket(TEXT("R_Hand_Socket"));
-	FString SampleWeaponPath = "/Game/Blueprints/Actors/Equipment/BP_SampleAxe.BP_SampleAxe_C";
+	FString SampleWeaponPath = "/Game/Blueprints/Actors/Equipment/BP_SampleWeapon.BP_SampleWeapon_C";
 	UClass* WeaponClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), NULL, *SampleWeaponPath));
 	
 	auto SampleWeapon = GetWorld()->SpawnActor<ABaseWeapon>(WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator);
@@ -103,7 +103,6 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 		
 		// Move to location.
 		Astar->MoveToLocation(RB_Vector);
-			
 
 		// Check wheater the clicked target is a unit or not.
 		if (Target->IsA(AUnit::StaticClass())) {
@@ -128,6 +127,11 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 	}
 }
 
+void ABaseMeleeUnit::StopMovement() {
+	GetCharacterMovement()->StopMovementImmediately();
+	Astar->ClearRoute();
+}
+
 void ABaseMeleeUnit::BasicAttack() {
 	FHitResult RayCastingResult;
 	FVector TargetLocation;
@@ -142,6 +146,8 @@ void ABaseMeleeUnit::BasicAttack() {
 	
 	if (distance > 0 && distance <= UnitStat->attackRange) {
 		auto DesiredRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetUnit->GetActorLocation());
+		
+		StopMovement();
 		SetActorRotation(DesiredRotation);
 
 		AnimInstance->PlayBasicAttack();
@@ -171,6 +177,7 @@ void ABaseMeleeUnit::SkillActivator() {
 
 	if (distance > 0 && distance <= DecalSkillRange->DecalSize.Y) {
 		if (IsValid(SkillRef)) {
+			StopMovement();
 			SkillRef->SkillAction(this);
 			AnimInstance->PlayBasicAttack();
 			TurnOffBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER);
@@ -180,11 +187,12 @@ void ABaseMeleeUnit::SkillActivator() {
 }
 
 void ABaseMeleeUnit::GetHitLocation(FVector& Result) {
-	auto HitSocket = Weapon->EquipmentSkeletal->GetSocketByName("HitLocationSocket");
-	
-	Result = FVector::ZeroVector;
-	if (IsValid(HitSocket))
-		Result = HitSocket->GetSocketLocation(Weapon->EquipmentSkeletal);
+	//auto HitSocket = Weapon->EquipmentMesh->GetSocketByName("HitLocationSocket");
+	//
+	//Result = FVector::ZeroVector;
+	//if (IsValid(HitSocket))
+	//	HitSocket->Location
+	//	Result = HitSocket->GetSocketLocation(Weapon->EquipmentMesh);
 }
 
 bool ABaseMeleeUnit::CheckBehavior(UNIT_BEHAVIOR var) {

@@ -11,8 +11,8 @@ UAxeSkillAnimInstance::UAxeSkillAnimInstance() {
 		TEXT("/Game/Mannequin/Animations/AM_Axe_SkullCrack.AM_Axe_SkullCrack"));
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> MON_CycloneAxe(
 		TEXT("/Game/Mannequin/Animations/AM_Axe_CycloneAxe.AM_Axe_CycloneAxe"));
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> P_SkullCrackHit(
-		TEXT("/Game/FXVarietyPack/Particles/P_ky_hit2.P_ky_hit2"));
+	//static ConstructorHelpers::FObjectFinder<UParticleSystem> P_SkullCrackHit(
+	//	TEXT("/Game/FXVarietyPack/Particles/P_ky_hit2.P_ky_hit2"));
 
 	SkillCrack_Hit = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("HitEffect"));
 
@@ -20,10 +20,9 @@ UAxeSkillAnimInstance::UAxeSkillAnimInstance() {
 		SkullCrackMontage = MON_SkullCrack.Object;
 	if (MON_CycloneAxe.Succeeded())
 		CycloneAxeMontage = MON_CycloneAxe.Object;
-	if (P_SkullCrackHit.Succeeded()) {
-		SkillCrack_Hit->SetTemplate(P_SkullCrackHit.Object);
-		SkillCrack_Hit->bAutoActivate = false;
-	}
+
+	SkillCrack_Hit->bAutoActivate = false;
+	SkillCrack_Hit->SetCollisionProfileName("NoCollision");
 }
 
 void UAxeSkillAnimInstance::PlaySkullCrack() {
@@ -44,18 +43,24 @@ void UAxeSkillAnimInstance::AnimNotify_SkillEnd() {
 	}
 }
 
-void UAxeSkillAnimInstance::AnimNotify_SkillCheck() {
+void UAxeSkillAnimInstance::AnimNotify_SkullCrackHit() {
 	auto aUnit = Cast<ABaseMeleeUnit>(GetOwningActor());
-
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("AnimNotify_SkillCheck"));
 	if (IsValid(aUnit)) {
-		FVector HitLocation;
+		/*FVector HitLocation;
 		
 		aUnit->GetHitLocation(HitLocation);
-		if (HitLocation != FVector::ZeroVector) {
-			auto WeaponSkeletal = aUnit->Weapon->EquipmentSkeletal;
+		if (HitLocation != FVector::ZeroVector) {*/
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("active"));
+			
+		aUnit->Weapon->ActiveHitParticle(SkillCrack_Hit);
+		//auto WeaponSkeletal = aUnit->Weapon->EquipmentSkeletal;
 
-			SkillCrack_Hit->AttachTo(WeaponSkeletal, "HitLocationSocket");
-			SkillCrack_Hit->Activate();
-		}
+		//SkillCrack_Hit->AttachToComponent(WeaponSkeletal, );
+		/*SkillCrack_Hit->AttachTo(WeaponSkeletal, "HitLocationSocket");
+		SkillCrack_Hit->Activate();*/
+
+
 	}
+	//}
 }

@@ -12,7 +12,7 @@
 
 
 static const int POOLSIZE = 128;
-static const int SEGMENT = 80;
+static const int SEGMENT = 60;
 static const int RADIUS = SEGMENT / 2;
 static const int WIDTH = SEGMENT;
 static const int HEIGHT = SEGMENT;
@@ -192,7 +192,6 @@ struct FGraph {
 			int cStep = Que.size();
 			while (cStep--) {
 				int cIndex = Que.front(); Que.pop();
-				UE_LOG(LogTemp, Log, TEXT("INININ"));
 				auto AdjList = GetAdjacentList(cIndex);
 				
 				for (auto nIndex : AdjList) {
@@ -265,6 +264,8 @@ struct FGraph {
 				
 				if (NodeMap[nIndex].bOpen && !NodeMap[nIndex].bBlocked) {
 					NodeMap[nIndex].TraversalCost = FMath::Min((int)GetTraversalCost(cIndex, nIndex) + NodeMap[cIndex].TraversalCost, (int)NodeMap[nIndex].TraversalCost);
+
+					if (!NodeMap.Contains(v->index)) break;
 
 					if (NodeMap[nIndex].TotalCost > NodeMap[nIndex].TraversalCost + GetHeuristicCost(nIndex, v->index)) {
 						NodeMap[nIndex].TotalCost = NodeMap[nIndex].TraversalCost + GetHeuristicCost(nIndex, v->index);
@@ -355,9 +356,9 @@ public:
 		Graph.FindPath(StartPos, EndPos, PathVector);
 		
 		// Debug.
-		//for (auto path : PathVector) {
-		//	DrawDebugSphere(Graph.InWorld, path, RADIUS, 20, FColor::Red, false, 1.f);
-		//}
+	/*	for (auto path : PathVector) {
+			DrawDebugSphere(Graph.InWorld, path, RADIUS, 20, FColor::Red, false, 1.f);
+		}*/
 	}
 
 	FGraph Graph;

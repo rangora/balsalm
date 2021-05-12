@@ -2,12 +2,13 @@
 
 
 #include "PathSphere.h"
+#include "Engine.h"
 
 // Sets default values
 APathSphere::APathSphere() {
 	PrimaryActorTick.bCanEverTick = false;
 	DestSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DestSphere"));
-	DestSphere->SetSphereRadius(30.f);
+	DestSphere->SetSphereRadius(24.f);
 	DestSphere->SetCollisionProfileName(TEXT("Trigger"));
 	RootComponent = DestSphere;
 }
@@ -18,5 +19,8 @@ APathSphere::~APathSphere() {}
 
 void APathSphere::BeginPlay() {
 	Super::BeginPlay();
-	SetActorHiddenInGame(true);
+}
+
+void APathSphere::BeginDestroy() {
+	Super::BeginDestroy();
 }
