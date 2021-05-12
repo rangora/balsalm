@@ -6,6 +6,7 @@
 #include "Component/StatComponent.h"
 #include "Component/AstarComponent.h"
 #include "Component/ArmStatComponent.h"
+#include "Equipment/BaseWeapon.h"
 #include "Animation/MeleeAnimInstance.h"
 #include "../../ActorType.h"
 #include "../../System/MainGameMode.h"
@@ -176,6 +177,14 @@ void ABaseMeleeUnit::SkillActivator() {
 			TurnOnBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE);
 		}
 	}
+}
+
+void ABaseMeleeUnit::GetHitLocation(FVector& Result) {
+	auto HitSocket = Weapon->EquipmentSkeletal->GetSocketByName("HitLocationSocket");
+	
+	Result = FVector::ZeroVector;
+	if (IsValid(HitSocket))
+		Result = HitSocket->GetSocketLocation(Weapon->EquipmentSkeletal);
 }
 
 bool ABaseMeleeUnit::CheckBehavior(UNIT_BEHAVIOR var) {

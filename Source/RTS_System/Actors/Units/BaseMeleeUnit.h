@@ -47,6 +47,7 @@ public:
 	/* Skill system. */
 	void AppointTheSkillTarget(float skillRange, USkillObject* ActivatedSkill);
 	void SkillActivator();
+	void GetHitLocation(FVector& Result);
 
 	// Behavior controller.
 	bool CheckBehavior(UNIT_BEHAVIOR var);

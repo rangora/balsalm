@@ -23,10 +23,14 @@ public:
 
 	UFUNCTION()
 		void AnimNotify_SkillEnd();
-
+	UFUNCTION()
+		void AnimNotify_SkillCheck();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AxeSkill)
 		UAnimMontage* SkullCrackMontage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AxeSkill)
 		UAnimMontage* CycloneAxeMontage;
+
+	UPROPERTY(EditAnywhere)
+		UParticleSystemComponent* SkillCrack_Hit;
 };
