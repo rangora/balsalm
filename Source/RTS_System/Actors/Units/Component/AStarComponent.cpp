@@ -20,11 +20,8 @@ UAStarComponent::~UAStarComponent() {
 	delete Core;
 }
 
-
-
 void UAStarComponent::BeginPlay() {
 	Super::BeginPlay();
-
 	Core = new AstarPathFinding(GetOwner());
 }
 
@@ -34,7 +31,6 @@ void UAStarComponent::InitializeComponent() {
 }
 
 
-// Called every frame
 void UAStarComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -42,22 +38,29 @@ void UAStarComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		TArray<AActor*> PathArray;
 		GetOwner()->GetOverlappingActors(PathArray, APathSphere::StaticClass());
 
+		// Arrive at a target path sphere.
 		if (PathArray.Num()) {
 			if (IsValid(PathArray[0])) {
 				PathArray[0]->Destroy();
 			}
+
+			// So, get the next path sphere.
 			bNextStep = true;
-			// Got it.
-			if (++PathSize > PathLocation.Num()) {
-				PathSize = 1;
+
+			// Check reach the final destination.
+			if (LocationArray.Num() == 0) {
 				bNextStep = bMoving = bNeedToGo = false;
 			}
 		}
 
+		// Move to the next path sphere.
 		if (bNextStep) {
-			if (Dele_PathFind.IsBound())
-				Dele_PathFind.Execute(PathLocation.Num() - PathSize);
-			//FollowThePath(PathLocation.Num() - PathSize);
+			if (Dele_PathFind.IsBound()) {
+				if (LocationArray.Num())
+					Dele_PathFind.Execute();
+				else
+					ClearRoute();
+			}
 			bNextStep = false;
 		}
 	}
@@ -65,7 +68,7 @@ void UAStarComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UAStarComponent::MoveToLocation(const FVector& LocationValue) {
 	auto InWorld = GetWorld();
-	PathLocation.Empty();
+	LocationArray.Empty();
 
 	for (auto Element : PathSpheres) {
 		if (IsValid(Element) && !Element->IsPendingKill())
@@ -73,17 +76,25 @@ void UAStarComponent::MoveToLocation(const FVector& LocationValue) {
 	}
 	PathSpheres.Reset();
 
-	Core->Find(GetOwner()->GetActorLocation(), LocationValue, PathLocation, InWorld);
-	if (PathLocation.Num()) {
-		PathSize = 1;
+	Core->Find(GetOwner()->GetActorLocation(), LocationValue, LocationArray, InWorld);
+
+	if (LocationArray.Num()) {
 		bMoving = bNextStep = bNeedToGo = true;
 	}
 }
 
-void UAStarComponent::FollowThePath(int32 idx) {
+void UAStarComponent::ClearRoute() {
+	LocationArray.Empty();
+	PathSpheres.Reset();
+}
+
+void UAStarComponent::FollowThePath() {
 	auto IUnit = Cast<AUnit>(GetOwner());
 	auto AIController = Cast<AAIController>(IUnit->GetController());
-	auto NewSphere = GetWorld()->SpawnActor<APathSphere>(APathSphere::StaticClass(), PathLocation[idx], FRotator::ZeroRotator);
+
+	auto NextLocation = LocationArray.Pop();
+	auto NewSphere = GetWorld()->SpawnActor<APathSphere>(APathSphere::StaticClass(), NextLocation, FRotator::ZeroRotator);
+
 	PathSpheres.Add(NewSphere);
-	AIController->MoveToLocation(PathLocation[idx], -1.f, false, false);
+	AIController->MoveToLocation(NextLocation, -1.f, false, false);
 }

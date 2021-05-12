@@ -15,6 +15,11 @@ public:
 	APathSphere();
 	~APathSphere();
 	virtual void BeginPlay() override;
+	virtual void BeginDestroy() override;
 
-	USphereComponent* DestSphere;
+	UPROPERTY()
+		UStaticMeshComponent* StaticSphere;
+	
+	UPROPERTY()
+		USphereComponent* DestSphere;
 };

@@ -9,7 +9,7 @@
 class AstarPathFinding;
 class APathSphere;
 
-DECLARE_DELEGATE_OneParam(FDelePathFind,int32);
+DECLARE_DELEGATE(FDelePathFind);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class RTS_SYSTEM_API UAStarComponent : public UActorComponent {
@@ -23,9 +23,10 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void MoveToLocation(const FVector& LocationValue);
+	void ClearRoute();
 
 	UFUNCTION()
-		void FollowThePath(int32 idx);
+		void FollowThePath();
 
 	bool bMoving;
 
@@ -33,9 +34,8 @@ private:
 	UPROPERTY()
 		TArray<APathSphere*> PathSpheres;
 	UPROPERTY()
-		TArray<FVector> PathLocation;
+		TArray<FVector> LocationArray;
 	
-	int PathSize;
 	bool bNeedToGo;
 	bool bNextStep;
 

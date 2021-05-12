@@ -41,6 +41,7 @@ public:
 	// Mouse right button action.
 	virtual void Interaction_Implementation(const FVector& RB_Vector, AActor* Target);
 
+	void StopMovement();
 	void BasicAttack();
 	void BasicAttackEnd();
 

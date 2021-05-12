@@ -102,7 +102,6 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 		
 		// Move to location.
 		Astar->MoveToLocation(RB_Vector);
-			
 
 		// Check wheater the clicked target is a unit or not.
 		if (Target->IsA(AUnit::StaticClass())) {
@@ -127,6 +126,11 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 	}
 }
 
+void ABaseMeleeUnit::StopMovement() {
+	GetCharacterMovement()->StopMovementImmediately();
+	Astar->ClearRoute();
+}
+
 void ABaseMeleeUnit::BasicAttack() {
 	FHitResult RayCastingResult;
 	FVector TargetLocation;
@@ -141,6 +145,8 @@ void ABaseMeleeUnit::BasicAttack() {
 	
 	if (distance > 0 && distance <= UnitStat->attackRange) {
 		auto DesiredRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetUnit->GetActorLocation());
+		
+		StopMovement();
 		SetActorRotation(DesiredRotation);
 
 		AnimInstance->PlayBasicAttack();
@@ -170,6 +176,7 @@ void ABaseMeleeUnit::SkillActivator() {
 
 	if (distance > 0 && distance <= DecalSkillRange->DecalSize.Y) {
 		if (IsValid(SkillRef)) {
+			StopMovement();
 			SkillRef->SkillAction(this);
 			AnimInstance->PlayBasicAttack();
 			TurnOffBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER);
