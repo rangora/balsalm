@@ -182,6 +182,8 @@ void ABaseMeleeUnit::SkillActivator() {
 
 	if (distance >= 0 && distance <= DecalSkillRange->DecalSize.Y) {
 		if (IsValid(SkillRef)) {
+			StopMovement();
+			FaceTarget();
 			SkillRef->SkillAction(this);
 			TurnOffBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER);
 			TurnOnBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE);
