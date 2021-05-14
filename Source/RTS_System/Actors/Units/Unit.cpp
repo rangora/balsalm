@@ -74,9 +74,6 @@ void AUnit::AttackCheck() {
 		FDamageEvent DamageEvent;
 		TargetUnit->TakeDamage(amount, DamageEvent, GetController(), this);
 	}
-	else {
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("UNVALID own targetunit!!"));
-	}
 }
 
 void AUnit::SetTargetUnit(AUnit* pUnit) {

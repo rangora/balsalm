@@ -14,6 +14,7 @@
 #include "../../System/Handler/SkillObject.h"
 #include "../../System/Handler/SkillAnimHandler.h"
 #include "../../UI/MainHUD.h"
+#include "../Misc/AttackCaculator.h"
 
 
 
@@ -88,13 +89,13 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 		}
 
 		// Cancel basic attack animation for movement.
-		if (CheckBehavior(UNIT_BEHAVIOR::ATTACKING)) {
-			DefaultAnimInstance->StopAllMontages(0.3f);
-			TurnOffBehavior(UNIT_BEHAVIOR::ATTACKING);
-		}
+		//if (CheckBehavior(UNIT_BEHAVIOR::ATTACKING)) {
+		//	DefaultAnimInstance->StopAllMontages(0.3f);
+		//	TurnOffBehavior(UNIT_BEHAVIOR::ATTACKING);
+		//}
 		
 		// Move to location.
-		Astar->MoveToLocation(RB_Vector);
+		//Astar->MoveToLocation(RB_Vector);
 
 		// Check wheater the clicked target is a unit or not.
 		if (Target->IsA(AUnit::StaticClass())) {
@@ -106,15 +107,25 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 
 			// If the unit is a foe, set as target.
 			if (IMode->player_Team_Number != DesiredTargetUnit->unit_Team_Number) {
-				TargetUnit = DesiredTargetUnit;
-				TurnOnBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER);
+
+				if (TargetUnit != DesiredTargetUnit) {
+					TargetUnit = DesiredTargetUnit;
+					TurnOnBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER);
+					Astar->MoveToLocation(RB_Vector);
+				}
 			}
 		}
 
-		// Just movent order. Turn off other flag.
+		//  Movement order. Turn off other flag.
 		else {
+			if(CheckBehavior(UNIT_BEHAVIOR::ATTACKING))
+				DefaultAnimInstance->StopAllMontages(0.3f);
+			
 			TurnOffBehavior(UNIT_BEHAVIOR::ATTACKING);
 			TurnOffBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER);
+		
+			// Move to location.
+			Astar->MoveToLocation(RB_Vector);
 		}
 	}
 }
@@ -174,10 +185,17 @@ void ABaseMeleeUnit::SkillActivator() {
 			StopMovement();
 			FaceTarget();
 			SkillRef->SkillAction(this);
-			DefaultAnimInstance->PlayBasicAttack();
 			TurnOffBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER);
 			TurnOnBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE);
 		}
+	}
+}
+
+void ABaseMeleeUnit::SkillAttackCheck() {
+	if (IsValid(TargetUnit)) {
+		float amount = UAttackCaculator::SkillDamage(this, TargetUnit);
+		FDamageEvent DamageEvent;
+		TargetUnit->TakeDamage(amount, DamageEvent, GetController(), this);
 	}
 }
 

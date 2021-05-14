@@ -37,6 +37,7 @@ public:
 		UDataTable* SkillVariableTable;
 
 private:
+	void SkillTableCreate();
 	void InitSkillVariable();
 	void SetWeaponSkilData(TArray<UWidget*>& Slots, const SArray* SkillArray, WEAPONTYPE WeaponType);
 };

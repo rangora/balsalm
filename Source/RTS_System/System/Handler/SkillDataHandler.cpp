@@ -13,21 +13,12 @@
 USkillDataHandler::USkillDataHandler() {
 	ConstructorHelpers::FObjectFinder<UDataTable> SkillVariableTable_Class(
 		TEXT("/Game/DataTable/Skill/SkillVariableTable.SkillVariableTable"));
+	
 	if (SkillVariableTable_Class.Succeeded()) 
 		SkillVariableTable = SkillVariableTable_Class.Object;
 	
-	// Creating Skill Table..
-	TArray<USkillAnimHandler*> SkillAnimArray;
-	SkillAnimArray.Add(NewObject<UAxe_SkullCrash>());
-	SkillAnimArray.Add(NewObject<UAxe_DualStrike>());
-	
-	for (int i = 0; i < SkillAnimArray.Num(); i++) {
-		AxeSkills.Add(NewObject<USkillObject>());
-		AxeSkills[i]->SkillAnimMgr = SkillAnimArray[i];
-	}
-	
-	//GunSkills.Add(NewObject<UGun_CripplingShot>());
 
+	SkillTableCreate();
 	InitSkillVariable();
 }
 
@@ -73,6 +64,17 @@ void USkillDataHandler::SetWeaponSkilData(TArray<UWidget*>& Slots, const SArray*
 
 
 ///// Private functions. /////
+
+void USkillDataHandler::SkillTableCreate() {
+	TArray<USkillAnimHandler*> SkillAnimArray;
+	SkillAnimArray.Add(NewObject<UAxe_SkullCrash>());
+	SkillAnimArray.Add(NewObject<UAxe_DualStrike>());
+	
+	for (int i = 0; i < SkillAnimArray.Num(); i++) {
+		AxeSkills.Add(NewObject<USkillObject>());
+		AxeSkills[i]->SkillAnimMgr = SkillAnimArray[i];
+	}
+}
 
 void USkillDataHandler::InitSkillVariable() {
 	TArray<SArray*> SkillIndexMatrix;

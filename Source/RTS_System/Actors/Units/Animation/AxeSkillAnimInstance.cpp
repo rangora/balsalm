@@ -46,5 +46,6 @@ void UAxeSkillAnimInstance::AnimNotify_SkullCrackHit() {
 	auto aUnit = Cast<ABaseMeleeUnit>(GetOwningActor());
 	if (IsValid(aUnit)) {
 		aUnit->Weapon->ActiveHitParticle(SkillCrack_Hit);
+		aUnit->SkillAttackCheck();
 	}
 }

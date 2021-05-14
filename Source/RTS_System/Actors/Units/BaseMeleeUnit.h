@@ -49,8 +49,9 @@ public:
 	/* Skill system. */
 	void AppointTheSkillTarget(float skillRange, USkillAnimHandler* ActivatedSkill);
 	void SkillActivator();
+	void SkillAttackCheck();
 
-	// Behavior controller.
+	/* Behavior controller. */
 	bool CheckBehavior(UNIT_BEHAVIOR var);
 	void TurnOnBehavior(UNIT_BEHAVIOR var);
 	void TurnOffBehavior(UNIT_BEHAVIOR var);
