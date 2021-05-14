@@ -6,6 +6,7 @@
 #include "../ActorType.h"
 #include "../System/MainInstance.h"
 #include "../System/Handler/SkillDataHandler.h"
+#include "../System/Handler/SkillAnimHandler.h"
 #include "../System/Handler/SkillObject.h"
 #include "../Actors/Units/BaseMeleeUnit.h"
 #include "../Actors/Units/Component/ArmStatComponent.h"
@@ -167,9 +168,9 @@ void USkillControlUI::GetUnitSkillData(const ABaseMeleeUnit* pUnit, const UGridP
 	for (int idx = 1; idx <= 4; idx++) {
 		auto UI_SkillSlot = Cast<UWeaponSkillSlot>(SkillPanel_Slots[idx]);
 
-		if (UnitSkillObjects[idx - 1]->Skill_ID != EMPTY_SKILL_ID) {
+		if (UnitSkillObjects[idx - 1]->GetID() != EMPTY_SKILL_ID) {
 			UI_SkillSlot->SkillObject = UnitSkillObjects[idx - 1];
-			UI_SkillSlot->CurrentTexture = UnitSkillObjects[idx - 1]->SkillParams->ThumbnailTexture;
+			UI_SkillSlot->CurrentTexture = UnitSkillObjects[idx - 1]->SkillAnimMgr->SkillParams->ThumbnailTexture;
 			UI_SkillSlot->SetThumbnailImage();
 		}
 		else {
@@ -194,15 +195,15 @@ void USkillControlUI::UpdateUnitSkillData(const ABaseMeleeUnit* pUnit, const UGr
 		
 		if (IsValid(UI_SkillSlot)) {
 			if (UI_SkillSlot->SkillObject!=nullptr) {
-				UnitSkillObjects[idx-1] = UI_SkillSlot->SkillObject;
+				UnitSkillObjects[idx - 1]->Clone(UI_SkillSlot->SkillObject);
 			}
 			else {
-				UnitSkillObjects[idx - 1]->Skill_ID = EMPTY_SKILL_ID;
+				UnitSkillObjects[idx - 1]->GetID() = EMPTY_SKILL_ID;
 			}
 		}
 
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red,
-			FString::Printf(TEXT("update:%s"), *UnitSkillObjects[idx-1]->Skill_ID.ToString()));
+			FString::Printf(TEXT("update:%s"), *UnitSkillObjects[idx-1]->GetID().ToString()));
 
 	}
 

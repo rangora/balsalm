@@ -12,14 +12,12 @@
 #include "../../System/MainGameMode.h"
 #include "../../System/MainController.h"
 #include "../../System/Handler/SkillObject.h"
+#include "../../System/Handler/SkillAnimHandler.h"
 #include "../../UI/MainHUD.h"
 
 
 
 ABaseMeleeUnit::ABaseMeleeUnit() : skillRadius(0.f) {
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_Basic(
-		TEXT("/Game/Mannequin/Animations/ANIM_UnitGraph.ANIM_UnitGraph_C"));
-	
 	// Skill range dacal init.
 	DecalSkillRange = CreateDefaultSubobject<UDecalComponent>(TEXT("DecalSkillRange"));
 	DecalSkillRange->SetupAttachment(GetMesh());
@@ -35,10 +33,6 @@ ABaseMeleeUnit::ABaseMeleeUnit() : skillRadius(0.f) {
 	// Skill radius sphere init.
 	SkillRadius = CreateDefaultSubobject<USphereComponent>(TEXT("SkillRadius"));
 	SkillRadius->SetupAttachment(GetMesh());
-
-	// Basic anim init.
-	if (ANIM_Basic.Succeeded())
-		DefaultAnimInstaceClass = ANIM_Basic.Class;
 
 	Behavior = UNIT_BEHAVIOR::MOVABLE;
 }
@@ -74,10 +68,8 @@ void ABaseMeleeUnit::BeginPlay() {
 
 void ABaseMeleeUnit::PostInitializeComponents() {
 	Super::PostInitializeComponents();
-	
-	// test 
-	GetMesh()->SetAnimInstanceClass(DefaultAnimInstaceClass);
-	AnimInstance = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
+
+	DefaultAnimInstance = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
 }
 
 void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor* Target) {
@@ -97,7 +89,7 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 
 		// Cancel basic attack animation for movement.
 		if (CheckBehavior(UNIT_BEHAVIOR::ATTACKING)) {
-			AnimInstance->StopAllMontages(0.3f);
+			DefaultAnimInstance->StopAllMontages(0.3f);
 			TurnOffBehavior(UNIT_BEHAVIOR::ATTACKING);
 		}
 		
@@ -144,21 +136,23 @@ void ABaseMeleeUnit::BasicAttack() {
 
 	float distance = FVector::Distance(TargetLocation, GetActorLocation());
 	
-	if (distance > 0 && distance <= UnitStat->attackRange) {
-		auto DesiredRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetUnit->GetActorLocation());
-		
+	if (distance >= 0 && distance <= UnitStat->attackRange) {
 		StopMovement();
-		SetActorRotation(DesiredRotation);
-
-		AnimInstance->PlayBasicAttack();
+		FaceTarget();
+		DefaultAnimInstance->PlayBasicAttack();
 		TurnOffBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER);
 		TurnOnBehavior(UNIT_BEHAVIOR::ATTACKING);
 	}
 }
 
-void ABaseMeleeUnit::BasicAttackEnd() {}
+void ABaseMeleeUnit::FaceTarget() {
+	if (IsValid(TargetUnit)) {
+		auto DesiredRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetUnit->GetActorLocation());
+		SetActorRotation(DesiredRotation);
+	}
+}
 
-void ABaseMeleeUnit::AppointTheSkillTarget(float skillRange, USkillObject* ActivatedSkill) {
+void ABaseMeleeUnit::AppointTheSkillTarget(float skillRange, USkillAnimHandler* ActivatedSkill) {
 	// Show skill range.	
 	auto NewSkillSize = DecalSkillRange->DecalSize;
 	NewSkillSize.Y = skillRange;
@@ -175,24 +169,16 @@ void ABaseMeleeUnit::AppointTheSkillTarget(float skillRange, USkillObject* Activ
 void ABaseMeleeUnit::SkillActivator() {
 	float distance = FVector::Distance(TargetUnit->GetActorLocation(), GetActorLocation());
 
-	if (distance > 0 && distance <= DecalSkillRange->DecalSize.Y) {
+	if (distance >= 0 && distance <= DecalSkillRange->DecalSize.Y) {
 		if (IsValid(SkillRef)) {
 			StopMovement();
+			FaceTarget();
 			SkillRef->SkillAction(this);
-			AnimInstance->PlayBasicAttack();
+			DefaultAnimInstance->PlayBasicAttack();
 			TurnOffBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER);
 			TurnOnBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE);
 		}
 	}
-}
-
-void ABaseMeleeUnit::GetHitLocation(FVector& Result) {
-	//auto HitSocket = Weapon->EquipmentMesh->GetSocketByName("HitLocationSocket");
-	//
-	//Result = FVector::ZeroVector;
-	//if (IsValid(HitSocket))
-	//	HitSocket->Location
-	//	Result = HitSocket->GetSocketLocation(Weapon->EquipmentMesh);
 }
 
 bool ABaseMeleeUnit::CheckBehavior(UNIT_BEHAVIOR var) {
@@ -242,8 +228,8 @@ void ABaseMeleeUnit::SetBasicAnimInstance() {
 	GetMesh()->HandleExistingParallelEvaluationTask(bBlockOnTask, bPerformPostAnimEvaluation);	
 	
 	
-	GetMesh()->SetAnimInstanceClass(DefaultAnimInstaceClass);
-	AnimInstance = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
+	GetMesh()->SetAnimInstanceClass(DefaultAnimInstance->GetClass());
+	DefaultAnimInstance = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
 	bGoBasicAnimInstance = false;
 }
 

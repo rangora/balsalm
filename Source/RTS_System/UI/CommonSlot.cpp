@@ -62,7 +62,6 @@ void UCommonSlot::OverWrite(const UUserWidget* Origin) {}
 void UCommonSlot::DropAction(const UUserWidget* From) {}
 
 void UCommonSlot::SetDefaultThumbnailImage() {
-	// TEST
 	auto Tex = LoadObject<UTexture2D>(NULL, *DefaultTexturePath, NULL, LOAD_None, NULL);
 	ThumbnailImage->SetBrushFromTexture(Tex);
 }

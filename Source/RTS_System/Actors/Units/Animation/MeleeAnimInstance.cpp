@@ -14,7 +14,7 @@ UMeleeAnimInstance::UMeleeAnimInstance() {
 }
 
 void UMeleeAnimInstance::PlayBasicAttack() {
-	Montage_Play(BasicAttackMontage, 1.f);
+	Montage_Play(BasicAttackMontage, 1.5f);
 }
 
 void UMeleeAnimInstance::AnimNotify_AttackHit() {

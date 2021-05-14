@@ -15,6 +15,7 @@ class UMeleeAnimInstance;
 class ABaseEquipment;
 class UArmStatComponent;
 class USkillObject;
+class USkillAnimHandler;
 
 
 enum class UNIT_BEHAVIOR {
@@ -43,14 +44,11 @@ public:
 
 	void StopMovement();
 	void BasicAttack();
-	void BasicAttackEnd();
+	void FaceTarget();
 
 	/* Skill system. */
-	void AppointTheSkillTarget(float skillRange, USkillObject* ActivatedSkill);
+	void AppointTheSkillTarget(float skillRange, USkillAnimHandler* ActivatedSkill);
 	void SkillActivator();
-	void GetHitLocation(FVector& Result);
-
-
 
 	// Behavior controller.
 	bool CheckBehavior(UNIT_BEHAVIOR var);
@@ -67,12 +65,9 @@ public:
 
 	void EquipmentMount(ABaseEquipment* Item);
 
-	UPROPERTY()
-		TSubclassOf<UMeleeAnimInstance> DefaultAnimInstaceClass;
-	UPROPERTY()
-		UMeleeAnimInstance* DefaultAnimInstance;
+
 	UPROPERTY(EditAnywhere) 
-		UMeleeAnimInstance* AnimInstance;
+		UMeleeAnimInstance* DefaultAnimInstance;
 	UPROPERTY()
 		UArmStatComponent* ArmStatComponent;
 
@@ -82,12 +77,10 @@ public:
 		UDecalComponent* DecalSkillRange;
 
 	UPROPERTY()
-		USkillObject* SkillRef = nullptr;
+		USkillAnimHandler* SkillRef = nullptr;
 
 	float skillRadius;
 	bool bGoBasicAnimInstance = false;
-	//bool bMovable = true;
-	//bool bForSkill = false;
 
 private:
 	// Get target info from mainHUD.

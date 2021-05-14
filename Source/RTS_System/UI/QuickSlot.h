@@ -24,13 +24,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, meta = (BindWidget))
 		UImage* Cooldown;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadwrite)
 		USkillObject* SkillObject = nullptr;
-
-	UPROPERTY(BlueprintReadwrite)
-		float cooldownMax;
-	UPROPERTY(BlueprintReadwrite)
-		float currentCooldown;
-	UPROPERTY(BlueprintReadwrite)
-		bool bCooldown;
 };

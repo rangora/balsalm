@@ -17,34 +17,38 @@ UAxe_SkullCrash::UAxe_SkullCrash() {
 		AxeSkillAnimInstanceClass = ANIM_AxeSkill.Class;
 }
 
-void UAxe_SkullCrash::CheckSkillRange(ABaseMeleeUnit* pUnit) {
+void UAxe_SkullCrash::CheckSkillRange(AUnit* pUnit) {
 	float skillBasicAttack_amount = SkillParams->Variable01;
 	float skillAttack_rate = SkillParams->Variable02;
 	float skill_range = SkillParams->Variable03;
 
-	pUnit->AppointTheSkillTarget(skill_range, this);
+	auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
+
+	IUnit->AppointTheSkillTarget(skill_range, this);
 }
 
 void UAxe_SkullCrash::ActiveSkill(AUnit* pUnit) {
-	auto PlayerUnit = Cast<ABaseMeleeUnit>(pUnit);
+	auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
 
 	// anim change
-	if (IsValid(PlayerUnit)) {
-		CheckSkillRange(PlayerUnit);
+	if (IsValid(IUnit)) {
+		CheckSkillRange(IUnit);
 	}
 }
 
-void UAxe_SkullCrash::SkillAction(ABaseMeleeUnit* pUnit) {
-	pUnit->GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	pUnit->GetMesh()->SetAnimInstanceClass(AxeSkillAnimInstanceClass);
+void UAxe_SkullCrash::SkillAction(AUnit* pUnit) {
+	auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
 
-	auto pAnim = pUnit->GetMesh()->GetAnimInstance();
+	IUnit->GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	IUnit->GetMesh()->SetAnimInstanceClass(AxeSkillAnimInstanceClass);
+
+	auto pAnim = IUnit->GetMesh()->GetAnimInstance();
 	auto AxeAnim = Cast<UAxeSkillAnimInstance>(pAnim);
 
 	if (IsValid(AxeAnim)) {
 		if (SkillCoolTimeAction.IsBound()) {
 			SkillCoolTimeAction.Execute();
-			pUnit->TurnOffBehavior(UNIT_BEHAVIOR::MOVABLE);
+			IUnit->TurnOffBehavior(UNIT_BEHAVIOR::MOVABLE);
 			AxeAnim->PlaySkullCrack();
 		}
 		else 

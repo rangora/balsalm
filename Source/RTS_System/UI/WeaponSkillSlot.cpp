@@ -8,6 +8,8 @@
 #include "Components/Image.h"
 #include "../System/MainController.h"
 #include "../System/Handler/SkillObject.h"
+#include "../System/Handler/SkillAnimHandler.h"
+
 
 UWeaponSkillSlot::~UWeaponSkillSlot() {}
 
@@ -45,7 +47,7 @@ void UWeaponSkillSlot::DropAction(const UUserWidget* From) {
 		auto FromSlot = Cast<UWeaponSkillSlot>(From);
 
 		if (IsValid(FromSlot->SkillObject)) {
-			if (SkillPanel->UsedWeapon == FromSlot->SkillObject->SkillParams->WeaponType) {
+			if (SkillPanel->UsedWeapon == FromSlot->SkillObject->SkillAnimMgr->SkillParams->WeaponType) {
 				OverWrite(FromSlot);
 			}
 		}

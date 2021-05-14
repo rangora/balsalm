@@ -7,13 +7,10 @@
 #include "../DataTable/ABaseSkillTable.h"
 
 UMainInstance::UMainInstance() {
-	SkillDataHandler = NewObject<USkillDataHandler>();
+	
 }
 
 void UMainInstance::Init() {
 	Super::Init();
-
-	//BaseSkillData_Info* skillslot = new BaseSkillData_Info;
-	//skillslot = (AttackSkillData_Info*)skillslot;
-	//SkillDataHandler->SetSkillData(SKILLTYPE::WEAPON_MELEE, 1, skillslot);
+	SkillDataHandler = NewObject<USkillDataHandler>();
 }

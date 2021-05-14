@@ -20,14 +20,11 @@ public:
 	virtual void BeginPlay() override;
 	void ActiveHitParticle(UParticleSystemComponent* pParticle);
 
-	//UPROPERTY(EditAnywhere, BlueprintReadwrite)
-	//	USkeletalMeshComponent* EquipmentSkeletal;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadwrite)
 		UStaticMeshComponent* EquipmentMesh;
-
-	UPROPERTY(EditAnywhere, Category = Particle)
-		UParticleSystemComponent* HitParticle;
+	
+	// Ref from anim instance.
+	UParticleSystemComponent* HitParticle;
 
 	UPROPERTY(EditAnywhere, Category = ItemStat)
 		ITEMTYPE ItemType;
