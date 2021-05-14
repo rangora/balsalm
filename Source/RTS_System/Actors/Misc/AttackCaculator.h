@@ -18,4 +18,5 @@ class RTS_SYSTEM_API UAttackCaculator : public UObject {
 
 public:
 	static float CaculateDamage(const AUnit* From, const AUnit* To);
+	static float SkillDamage(const AUnit* From, const AUnit* To);
 };

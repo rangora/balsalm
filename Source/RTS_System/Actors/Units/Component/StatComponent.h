@@ -16,6 +16,7 @@ class RTS_SYSTEM_API UStatComponent : public UActorComponent {
 
 public:	
 	UStatComponent();
+	virtual void BeginPlay() override;
 	void TakeDamage(float totalDamage);
 
 	DOA DeadOrAlive;

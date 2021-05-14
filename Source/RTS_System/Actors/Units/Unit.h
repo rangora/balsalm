@@ -14,7 +14,7 @@ class UAStarComponent;
 class UDecoComponent;
 class UHeadUpHPbar;
 class ABaseWeapon;
-class UBaseSkillAnimInstance;
+class UAnimInstance;
 
 
 UCLASS()
@@ -44,13 +44,9 @@ public:
 
 	ABaseWeapon* Weapon;
 
-
 	// Variables.
 	UPROPERTY()
 		USphereComponent* AttackRadius;
-
-	UPROPERTY()
-		UBaseSkillAnimInstance* SuperSkillAnimInstance;
 
 	// Decoration.
 	UPROPERTY(VisibleAnywhere, Category = UI)

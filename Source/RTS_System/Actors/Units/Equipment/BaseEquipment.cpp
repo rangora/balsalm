@@ -2,20 +2,35 @@
 
 
 #include "BaseEquipment.h"
+#include "Engine/Engine.h"
+#include "Particles/ParticleSystemComponent.h"
+
+
 
 // Sets default values
 ABaseEquipment::ABaseEquipment() : ItemType(ITEMTYPE::EMPTY) {
 	PrimaryActorTick.bCanEverTick = false;
 
-	EquipmentSkeletal = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponSkeletal"));
 	EquipmentMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
+	HitParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("WeaponHitEffect"));
 
-	EquipmentSkeletal->SetCollisionProfileName(TEXT("NoCollision"));
 	EquipmentMesh->SetCollisionProfileName(TEXT("NoCollision"));
-	RootComponent = EquipmentSkeletal;
+	EquipmentMesh->SetupAttachment(RootComponent);
+
+	HitParticle->bAutoActivate = false;
+	HitParticle->SetCollisionProfileName("NoCollision");
+	HitParticle->SetupAttachment(EquipmentMesh, FName("HitLocationSocket"));
 }
 
 void ABaseEquipment::BeginPlay() {
 	Super::BeginPlay();
+}
+
+void ABaseEquipment::ActiveHitParticle(UParticleSystemComponent* pParticle) {
+	if(IsValid(pParticle)) {
+		HitParticle->SetTemplate(pParticle->Template);
+		HitParticle->SetRelativeScale3D(pParticle->GetRelativeScale3D());
+		HitParticle->Activate(true);
+	}
 }
 

@@ -13,11 +13,12 @@
 
 struct SkillVariable;
 class UAnimInstance;
+class UCoolDownHandler;
+class USkillAnimHandler;
 class AUnit;
-class ABaseMeleeUnit;
 
 
-DECLARE_DELEGATE(FSkillCoolTimeAction);
+
 
 
 UCLASS()
@@ -25,13 +26,29 @@ class RTS_SYSTEM_API USkillObject : public UObject {
 	GENERATED_BODY()
 public:
 	USkillObject();
+	void Init();
+	void Clone(USkillObject* SrcObject);
+
+
+	/* Interaction functions for external modules. */
+	FName GetID();
+	UTexture2D* GetThumbnailTexture();
+
+
+	/* Functions are used for SkillAnimMgr. */
+	virtual void CheckSkillRange(AUnit* pUnit);
 	virtual void ActiveSkill(AUnit* pUnit);
-	virtual void SkillAction(ABaseMeleeUnit* pUnit);
+	virtual void SkillAction(AUnit* pUnit);
 
-	FName Skill_ID;
 
-	// This can't be nullptr.
-	SkillVariable* SkillParams = nullptr;
+	/* Values are used for CoolDownMgr. */
+	UFUNCTION(BlueprintCallable)
+		float GetCoolDownMax();
+	UFUNCTION(BlueprintCallable)
+		float GetCurrentCoolDown();
 
-	FSkillCoolTimeAction SkillCoolTimeAction;
+	UPROPERTY(BlueprintReadwrite)
+		UCoolDownHandler* CoolDownMgr = nullptr;
+	UPROPERTY()
+		USkillAnimHandler* SkillAnimMgr = nullptr;
 };

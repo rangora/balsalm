@@ -11,6 +11,7 @@
 #include "../UI/MainHUD.h"
 #include "../UI/QuickSlot.h"
 #include "../System/Handler/SkillObject.h"
+#include "../System/Handler/CoolDownHandler.h"
 #include "../System/Handler/AllSkill.h"
 #include "../ActorType.h"
 #include "UMG/Public/Components/GridPanel.h"
@@ -98,13 +99,14 @@ void AMainController::ActiveQuickSlot(int32 idx) {
 
 		if (IsValid(InputedQuickSlot)) {
 			// Cooldowning..
-			if (InputedQuickSlot->bCooldown) return;
+			if(InputedQuickSlot->SkillObject->CoolDownMgr->IsCoolDown()) return;
+			//if (InputedQuickSlot->bCooldown) return;
 
 			auto UnitSkillObject = Cast<UQuickSlot>(UnitSkillArray[idx - 1])->SkillObject;
 
 			if (IsValid(UnitSkillObject)) {
 				auto UnitAnimInstance = Units[0]->GetMesh()->GetAnimInstance();
-				UnitSkillObject->ActiveSkill(Units[0]);
+				UnitSkillObject->SkillAnimMgr->ActiveSkill(Units[0]);
 			}
 		}
 	}

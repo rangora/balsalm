@@ -4,7 +4,6 @@
 #include "BaseWeapon.h"
 
 ABaseWeapon& ABaseWeapon::operator=(const ABaseWeapon& ref) {
-	this->EquipmentSkeletal = ref.EquipmentSkeletal;
 	this->EquipmentMesh = ref.EquipmentMesh;
 	this->ItemType = ref.ItemType;
 	

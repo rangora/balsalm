@@ -7,6 +7,10 @@
 #include "GameFramework/Actor.h"
 #include "BaseEquipment.generated.h"
 
+
+class UParticleSystemComponent;
+
+
 UCLASS()
 class RTS_SYSTEM_API ABaseEquipment : public AActor {
 	GENERATED_BODY()
@@ -14,12 +18,13 @@ class RTS_SYSTEM_API ABaseEquipment : public AActor {
 public:	
 	ABaseEquipment();
 	virtual void BeginPlay() override;
+	void ActiveHitParticle(UParticleSystemComponent* pParticle);
 
 	UPROPERTY(EditAnywhere, BlueprintReadwrite)
-		USkeletalMeshComponent* EquipmentSkeletal;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadwrite)
 		UStaticMeshComponent* EquipmentMesh;
+	
+	// Ref from anim instance.
+	UParticleSystemComponent* HitParticle;
 
 	UPROPERTY(EditAnywhere, Category = ItemStat)
 		ITEMTYPE ItemType;

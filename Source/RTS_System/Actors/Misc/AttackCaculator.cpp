@@ -2,11 +2,13 @@
 
 
 #include "AttackCaculator.h"
-#include "../Units/Unit.h"
+#include "../Units/BaseMeleeUnit.h"
 #include "../Units/Component/StatComponent.h"
 #include "../Units/Equipment/BaseWeapon.h"
-//#include "ActorType.h"
-//#include "../../ActorType.h"
+#include "../../System/Handler/SkillAnimHandler.h"
+#include "../../DataTable/ABaseSkillTable.h"
+
+
 
 float UAttackCaculator::CaculateDamage(const AUnit* From, const AUnit* To) {
 	float amount = From->UnitStat->currentDamage;
@@ -23,6 +25,17 @@ float UAttackCaculator::CaculateDamage(const AUnit* From, const AUnit* To) {
 		break;
 	}
 	}
+
+	return amount;
+}
+
+float UAttackCaculator::SkillDamage(const AUnit* From, const AUnit* To) {
+	auto Attacker = Cast<ABaseMeleeUnit>(From);
+	
+	auto SkillParamsRef = Attacker->SkillRef->SkillParams;
+	float amount = SkillParamsRef->Variable01;
+	amount += SkillParamsRef->Variable02 * Attacker->UnitStat->currentDamage;
+	amount -= To->UnitStat->Armor;
 
 	return amount;
 }

@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "SkillDataHandler.h"
 #include "Engine.h"
+#include "SkillAnimHandler.h"
 #include "AllSkill.h"
 #include "Components/Widget.h"
 #include "UObject/ConstructorHelpers.h"
@@ -13,14 +13,12 @@
 USkillDataHandler::USkillDataHandler() {
 	ConstructorHelpers::FObjectFinder<UDataTable> SkillVariableTable_Class(
 		TEXT("/Game/DataTable/Skill/SkillVariableTable.SkillVariableTable"));
+	
 	if (SkillVariableTable_Class.Succeeded()) 
 		SkillVariableTable = SkillVariableTable_Class.Object;
 	
-	// Creating Skill Table..
-	AxeSkills.Add(NewObject<UAxe_SkullCrash>());
-	AxeSkills.Add(NewObject<UAxe_DualStrike>());
-	GunSkills.Add(NewObject<UGun_CripplingShot>());
 
+	SkillTableCreate();
 	InitSkillVariable();
 }
 
@@ -48,7 +46,7 @@ void USkillDataHandler::SetWeaponSkilData(TArray<UWidget*>& Slots, const SArray*
 
 		if (IsValid(slot)) {
 			if (SkillArray->IsValidIndex(idx)) {
-				slot->CurrentTexture = (*SkillArray)[idx]->SkillParams->ThumbnailTexture;
+				slot->CurrentTexture = (*SkillArray)[idx]->SkillAnimMgr->SkillParams->ThumbnailTexture;
 				slot->SetThumbnailImage();
 				slot->SkillObject = (*SkillArray)[idx];
 				slot->bAssigned = true;
@@ -67,26 +65,37 @@ void USkillDataHandler::SetWeaponSkilData(TArray<UWidget*>& Slots, const SArray*
 
 ///// Private functions. /////
 
+void USkillDataHandler::SkillTableCreate() {
+	TArray<USkillAnimHandler*> SkillAnimArray;
+	SkillAnimArray.Add(NewObject<UAxe_SkullCrash>());
+	SkillAnimArray.Add(NewObject<UAxe_DualStrike>());
+	
+	for (int i = 0; i < SkillAnimArray.Num(); i++) {
+		AxeSkills.Add(NewObject<USkillObject>());
+		AxeSkills[i]->SkillAnimMgr = SkillAnimArray[i];
+	}
+}
+
 void USkillDataHandler::InitSkillVariable() {
 	TArray<SArray*> SkillIndexMatrix;
 	SkillIndexMatrix.Add(&AxeSkills);
-	SkillIndexMatrix.Add(&GunSkills);
+	//SkillIndexMatrix.Add(&GunSkills);
 
 	for (auto Row : SkillIndexMatrix) {
 		for (auto Element : *Row) {
-			auto Origin = SkillVariableTable->FindRow<FSkillVariable>(Element->Skill_ID, "");
-			Element->SkillParams = new SkillVariable;
-			Element->SkillParams->Skill_ID = Origin->Skill_ID;
-			Element->SkillParams->Variable01 = Origin->Variable01;
-			Element->SkillParams->Variable02 = Origin->Variable02;
-			Element->SkillParams->Variable03 = Origin->Variable03;
-			Element->SkillParams->Variable04 = Origin->Variable04;
-			Element->SkillParams->Variable05 = Origin->Variable05;
-			Element->SkillParams->WeaponType = Origin->WeaponType;
-			Element->SkillParams->SkillType = Origin->SkillType;
-			Element->SkillParams->SkillName = Origin->SkillName;
-			Element->SkillParams->Description = Origin->Description;
-			Element->SkillParams->ThumbnailTexture = Origin->ThumbnailTexture;
+			auto Origin = SkillVariableTable->FindRow<FSkillVariable>(Element->SkillAnimMgr->Skill_ID, "");
+			Element->SkillAnimMgr->SkillParams = new SkillVariable;
+			Element->SkillAnimMgr->SkillParams->Skill_ID = Origin->Skill_ID;
+			Element->SkillAnimMgr->SkillParams->Variable01 = Origin->Variable01;
+			Element->SkillAnimMgr->SkillParams->Variable02 = Origin->Variable02;
+			Element->SkillAnimMgr->SkillParams->Variable03 = Origin->Variable03;
+			Element->SkillAnimMgr->SkillParams->Variable04 = Origin->Variable04;
+			Element->SkillAnimMgr->SkillParams->Variable05 = Origin->Variable05;
+			Element->SkillAnimMgr->SkillParams->WeaponType = Origin->WeaponType;
+			Element->SkillAnimMgr->SkillParams->SkillType = Origin->SkillType;
+			Element->SkillAnimMgr->SkillParams->SkillName = Origin->SkillName;
+			Element->SkillAnimMgr->SkillParams->Description = Origin->Description;
+			Element->SkillAnimMgr->SkillParams->ThumbnailTexture = Origin->ThumbnailTexture;
 		}
 	}
 }

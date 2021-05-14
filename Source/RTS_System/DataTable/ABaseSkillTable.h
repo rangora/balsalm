@@ -36,5 +36,5 @@ struct SkillVariable {
 	SKILLTYPE SkillType;
 	FString SkillName;
 	FString Description;
-	UTexture2D* ThumbnailTexture;
+	UTexture2D* ThumbnailTexture = nullptr;
 };

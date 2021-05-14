@@ -4,6 +4,7 @@
 
 #include "Engine.h"
 #include "SkillObject.h"
+#include "SkillAnimHandler.h"
 #include "Templates/SubclassOf.h"
 #include "Axe_SkullCrash.generated.h"
 
@@ -16,14 +17,14 @@ class UAxeSkillAnimInstance;
 
 
 UCLASS()
-class RTS_SYSTEM_API UAxe_SkullCrash : public USkillObject {
+class RTS_SYSTEM_API UAxe_SkullCrash : public USkillAnimHandler {
 	GENERATED_BODY()
 public:
 	UAxe_SkullCrash();
 	
-	void CheckSkillRange(ABaseMeleeUnit* pUnit);
-	void virtual ActiveSkill(AUnit* pUnit) override;
-	void SkillAction(ABaseMeleeUnit* pUnit) override;
+	void CheckSkillRange(AUnit* pUnit) override;
+	void ActiveSkill(AUnit* pUnit) override;
+	void SkillAction(AUnit* pUnit) override;
 
 	UPROPERTY()
 		UAxeSkillAnimInstance* AxeSkillAnimInstance;

@@ -4,15 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "SkillObject.h"
+#include "SkillAnimHandler.h"
 #include "Axe_DualStrike.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class RTS_SYSTEM_API UAxe_DualStrike : public USkillObject {
+class RTS_SYSTEM_API UAxe_DualStrike : public USkillAnimHandler {
 	GENERATED_BODY()
 public:
 	UAxe_DualStrike();
-	void virtual ActiveSkill(AUnit* pUnit) override;
+	//void ActiveSkill(ABaseMeleeUnit* pUnit) override;
 };

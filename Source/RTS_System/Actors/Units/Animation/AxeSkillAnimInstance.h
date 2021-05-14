@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseSkillAnimInstance.h"
+#include "Animation/AnimInstance.h"
 #include "Animation/AnimInstance.h"
 #include "AxeSkillAnimInstance.generated.h"
 
@@ -13,7 +13,7 @@
 
 
 UCLASS()
-class RTS_SYSTEM_API UAxeSkillAnimInstance : public UBaseSkillAnimInstance {
+class RTS_SYSTEM_API UAxeSkillAnimInstance : public UAnimInstance {
 	GENERATED_BODY()
 public:
 	UAxeSkillAnimInstance();
@@ -23,10 +23,15 @@ public:
 
 	UFUNCTION()
 		void AnimNotify_SkillEnd();
+	UFUNCTION()
+		void AnimNotify_SkullCrackHit();
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AxeSkill)
 		UAnimMontage* SkullCrackMontage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AxeSkill)
 		UAnimMontage* CycloneAxeMontage;
+
+	UPROPERTY(EditAnywhere, Category = Paricle)
+		UParticleSystemComponent* SkillCrack_Hit;
 };
