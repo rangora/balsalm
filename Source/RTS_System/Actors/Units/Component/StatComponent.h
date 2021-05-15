@@ -9,6 +9,8 @@
 
 
 DECLARE_DELEGATE(FDeleHPBarUpdate);
+DECLARE_DELEGATE(FAfterDeadProcess);
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class RTS_SYSTEM_API UStatComponent : public UActorComponent {
@@ -39,4 +41,5 @@ public:
 	FCriticalSection _mutex;
 
 	FDeleHPBarUpdate Dele_HPWidgetUpdate;
+	FAfterDeadProcess AfterDeadProcess;
 };

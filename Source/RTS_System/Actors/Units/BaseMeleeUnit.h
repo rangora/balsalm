@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Unit.h"
+#include "TimerManager.h"
 #include "Equipment/BaseWeapon.h"
 #include "BaseMeleeUnit.generated.h"
 
@@ -22,6 +23,7 @@ enum class UNIT_BEHAVIOR {
 	NOTHING,
 	MOVABLE,
 	BASICATTACK_ORDER,
+	ATTACK_AVAILABLE,
 	ATTACKING,
 	SKILL_TARGETING,
 	SKILL_ACTIVE_ORDER,
@@ -80,13 +82,20 @@ public:
 	UPROPERTY()
 		USkillAnimHandler* SkillRef = nullptr;
 
+	FTimerHandle AttackSpeedTimer;
+
 	float skillRadius;
 	bool bGoBasicAnimInstance = false;
 
 private:
 	// Get target info from mainHUD.
 	void RequiredTargeting();
+	void AfterAttack();
+	void AttackAvailable();
 
-	FCriticalSection _mutex;
+	UFUNCTION()
+		void DeadProcess();
+
+	FCriticalSection _mutex, _behavior_mutex;
 	UNIT_BEHAVIOR Behavior;
 };

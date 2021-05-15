@@ -19,5 +19,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float MovementSpeed;
-	
+	UPROPERTY(BlueprintReadWrite)
+		bool bDead = false;
 };

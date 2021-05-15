@@ -77,6 +77,7 @@ void AUnit::AttackCheck() {
 }
 
 void AUnit::SetTargetUnit(AUnit* pUnit) {
-	if (IsValid(pUnit))
-		TargetUnit = pUnit;
+	if (IsValid(pUnit)) 
+		if(pUnit->UnitStat->DeadOrAlive == DOA::ALIVE)
+			TargetUnit = pUnit;
 }
