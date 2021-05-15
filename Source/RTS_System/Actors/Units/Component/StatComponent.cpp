@@ -35,5 +35,12 @@ void UStatComponent::TakeDamage(float totalDamage) {
 	}
 	if (Dele_HPWidgetUpdate.IsBound())
 		Dele_HPWidgetUpdate.Execute();
+	
+	// Dead check.
+	if (DeadOrAlive == DOA::DEAD) {
+		if (AfterDeadProcess.IsBound())
+			AfterDeadProcess.Execute();
+	}
+
 	_mutex.Unlock();
 }

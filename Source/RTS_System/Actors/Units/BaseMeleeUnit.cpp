@@ -18,6 +18,7 @@
 
 
 
+/* In-build functions. */
 ABaseMeleeUnit::ABaseMeleeUnit() : skillRadius(0.f) {
 	// Skill range dacal init.
 	DecalSkillRange = CreateDefaultSubobject<UDecalComponent>(TEXT("DecalSkillRange"));
@@ -36,6 +37,7 @@ ABaseMeleeUnit::ABaseMeleeUnit() : skillRadius(0.f) {
 	SkillRadius->SetupAttachment(GetMesh());
 
 	Behavior = UNIT_BEHAVIOR::MOVABLE;
+	TurnOnBehavior(UNIT_BEHAVIOR::ATTACK_AVAILABLE);
 }
 
 void ABaseMeleeUnit::Tick(float delta) {
@@ -64,15 +66,21 @@ void ABaseMeleeUnit::BeginPlay() {
 		SampleWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, WeaponSocket);
 		Weapon = SampleWeapon;
 		EquipmentMount(Weapon);
-	}
+	}	
 }
 
 void ABaseMeleeUnit::PostInitializeComponents() {
 	Super::PostInitializeComponents();
 
 	DefaultAnimInstance = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
+
+	UnitStat->AfterDeadProcess.BindUFunction(this, FName("DeadProcess"));
 }
 
+
+
+
+/* User functions. */
 void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor* Target) {
 	Super::Interaction_Implementation(RB_Vector, Target);
 
@@ -84,18 +92,11 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 
 		// Cancel skill targeting process.
 		if (CheckBehavior(UNIT_BEHAVIOR::SKILL_TARGETING)) {
+			_behavior_mutex.Lock();
 			TurnOffBehavior(UNIT_BEHAVIOR::SKILL_TARGETING);
+			_behavior_mutex.Unlock();
 			ShowSkillRadius(false);
 		}
-
-		// Cancel basic attack animation for movement.
-		//if (CheckBehavior(UNIT_BEHAVIOR::ATTACKING)) {
-		//	DefaultAnimInstance->StopAllMontages(0.3f);
-		//	TurnOffBehavior(UNIT_BEHAVIOR::ATTACKING);
-		//}
-		
-		// Move to location.
-		//Astar->MoveToLocation(RB_Vector);
 
 		// Check wheater the clicked target is a unit or not.
 		if (Target->IsA(AUnit::StaticClass())) {
@@ -107,8 +108,12 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 
 			// If the unit is a foe, set as target.
 			if (IMode->player_Team_Number != DesiredTargetUnit->unit_Team_Number) {
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("unit"));
+
 
 				if (TargetUnit != DesiredTargetUnit) {
+					GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("diff"));
+			
 					TargetUnit = DesiredTargetUnit;
 					TurnOnBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER);
 					Astar->MoveToLocation(RB_Vector);
@@ -118,12 +123,13 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 
 		//  Movement order. Turn off other flag.
 		else {
+			TargetUnit = nullptr;
 			if(CheckBehavior(UNIT_BEHAVIOR::ATTACKING))
 				DefaultAnimInstance->StopAllMontages(0.3f);
 			
 			TurnOffBehavior(UNIT_BEHAVIOR::ATTACKING);
 			TurnOffBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER);
-		
+
 			// Move to location.
 			Astar->MoveToLocation(RB_Vector);
 		}
@@ -139,20 +145,24 @@ void ABaseMeleeUnit::BasicAttack() {
 	FHitResult RayCastingResult;
 	FVector TargetLocation;
 
-	_mutex.Lock();
 	if (TargetUnit->UnitStat->DeadOrAlive == DOA::ALIVE) {
 		TargetLocation = TargetUnit->GetActorLocation();
 	}
-	_mutex.Unlock();
+	else {
+		TargetUnit = nullptr;
+		TurnOffBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER);
+		return;
+	}
 
 	float distance = FVector::Distance(TargetLocation, GetActorLocation());
 	
 	if (distance >= 0 && distance <= UnitStat->attackRange) {
-		StopMovement();
-		FaceTarget();
-		DefaultAnimInstance->PlayBasicAttack();
-		TurnOffBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER);
-		TurnOnBehavior(UNIT_BEHAVIOR::ATTACKING);
+		if (CheckBehavior(UNIT_BEHAVIOR::ATTACK_AVAILABLE)) {
+			StopMovement();
+			FaceTarget();
+			DefaultAnimInstance->PlayBasicAttack();
+			AfterAttack();
+		}
 	}
 }
 
@@ -174,10 +184,16 @@ void ABaseMeleeUnit::AppointTheSkillTarget(float skillRange, USkillAnimHandler* 
 	SkillRef = ActivatedSkill;
 	ShowSkillRadius(true);
 	RequiredTargeting();
+
 	TurnOnBehavior(UNIT_BEHAVIOR::SKILL_TARGETING);
 }
 
 void ABaseMeleeUnit::SkillActivator() {
+	if (!IsValid(TargetUnit)) {
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("non-SkillActivator"));
+		return;
+	}
+
 	float distance = FVector::Distance(TargetUnit->GetActorLocation(), GetActorLocation());
 
 	if (distance >= 0 && distance <= DecalSkillRange->DecalSize.Y) {
@@ -185,8 +201,11 @@ void ABaseMeleeUnit::SkillActivator() {
 			StopMovement();
 			FaceTarget();
 			SkillRef->SkillAction(this);
+
+			_behavior_mutex.Lock();
 			TurnOffBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER);
 			TurnOnBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE);
+			_behavior_mutex.Unlock();
 		}
 	}
 }
@@ -221,8 +240,10 @@ void ABaseMeleeUnit::ShowSkillRadius(bool bShow) {
 }
 
 void ABaseMeleeUnit::SkillTargetingFinish() {
+	_behavior_mutex.Lock();
 	TurnOnBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER);
 	TurnOffBehavior(UNIT_BEHAVIOR::SKILL_TARGETING);
+	_behavior_mutex.Unlock();
 
 	// Move to location.
 	FVector TargetLocation;
@@ -273,6 +294,11 @@ void ABaseMeleeUnit::EquipmentMount(ABaseEquipment* Item) {
 	}
 }
 
+
+
+
+
+/* Private functions. */
 void ABaseMeleeUnit::RequiredTargeting() {
 	auto IController = Cast<AMainController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	auto IHUD = Cast<AMainHUD>(IController->GetHUD());
@@ -280,4 +306,31 @@ void ABaseMeleeUnit::RequiredTargeting() {
 	if (IsValid(IHUD)) {
 		IHUD->MouseLeftButtonActionSwitcher();
 	}
+}
+
+void ABaseMeleeUnit::AfterAttack() {
+	float attackSpeedRate = UnitStat->attackSpeed;
+
+	TurnOnBehavior(UNIT_BEHAVIOR::ATTACKING);
+	TurnOffBehavior(UNIT_BEHAVIOR::ATTACK_AVAILABLE);
+
+	GetWorldTimerManager().SetTimer(AttackSpeedTimer, this, &ABaseMeleeUnit::AttackAvailable, attackSpeedRate, false);
+}
+
+void ABaseMeleeUnit::AttackAvailable() {
+	while (true) {
+		bool bGet = _behavior_mutex.TryLock();
+		if (bGet) {
+			TurnOnBehavior(UNIT_BEHAVIOR::ATTACK_AVAILABLE);
+			_behavior_mutex.Unlock();
+			break;
+		}
+	}
+
+	GetWorldTimerManager().ClearTimer(AttackSpeedTimer);
+}
+
+void ABaseMeleeUnit::DeadProcess() {
+	bGoBasicAnimInstance = true;
+	DefaultAnimInstance->bDead = true;
 }
