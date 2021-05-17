@@ -5,6 +5,7 @@
 #include "CameraPawn.h"
 #include "MainGameMode.h"
 #include "../Actors/Units/Component/DecoComponent.h"
+#include "../Actors/Units/Component/StatComponent.h"
 #include "../Actors/Units/BaseMeleeUnit.h"
 #include "../UI/ScreenUI.h"
 #include "../UI/SkillControlUI.h"
@@ -40,6 +41,8 @@ void AMainController::SetupInputComponent() {
 }
 
 /**********/
+
+
 
 
 /* User defined functions. */
@@ -98,15 +101,18 @@ void AMainController::ActiveQuickSlot(int32 idx) {
 		auto InputedQuickSlot = Cast<UQuickSlot>(UnitSkillArray[idx - 1]);
 
 		if (IsValid(InputedQuickSlot)) {
-			// Cooldowning..
-			if(InputedQuickSlot->SkillObject->CoolDownMgr->IsCoolDown()) return;
-			//if (InputedQuickSlot->bCooldown) return;
-
 			auto UnitSkillObject = Cast<UQuickSlot>(UnitSkillArray[idx - 1])->SkillObject;
 
+			// Is it empty quickSlot ?
+			if (!IsValid(UnitSkillObject)) return;
+
+			// Is it on cooldown ?
+			if(UnitSkillObject->bCoolDown()) return;
+
+
 			if (IsValid(UnitSkillObject)) {
-				auto UnitAnimInstance = Units[0]->GetMesh()->GetAnimInstance();
-				UnitSkillObject->SkillAnimMgr->ActiveSkill(Units[0]);
+				Units[0]->SkillRef = UnitSkillObject;
+				UnitSkillObject->SkillActivator(Units[0]);
 			}
 		}
 	}
@@ -130,6 +136,9 @@ void AMainController::SetUnits(TArray<AActor*> pUnits, bool bClicked=false) {
 		auto aUnit = Cast<AUnit>(pUnits[i]);
 
 		if (IsValid(aUnit)) {
+			// Check daead or alive.
+			if (aUnit->UnitStat->DeadOrAlive == DOA::DEAD) continue;
+
 			// Allies 
 			if (IMode->player_Team_Number == aUnit->unit_Team_Number) {
 				Units.Add(aUnit);
@@ -154,11 +163,6 @@ void AMainController::SetUnits(TArray<AActor*> pUnits, bool bClicked=false) {
 	SetSkillPanelVisibility(bShowSkillPanel);
 }
 
-/**************/
-
-
-/* Private functions. */
-
 bool AMainController::IsOnlyOneAllyUnitSelected() {
 	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	
@@ -168,6 +172,16 @@ bool AMainController::IsOnlyOneAllyUnitSelected() {
 	}
 	return false;
 }
+
+
+
+
+
+/**************/
+
+
+/* Private functions. */
+
 
 /**************/
 

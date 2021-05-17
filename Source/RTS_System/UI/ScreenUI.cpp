@@ -57,6 +57,6 @@ void UScreenUI::CleanAllSlots() {
 	for (int idx = 0; idx < UNIT_SKILLSLOT_LENGTH; idx++) {
 		auto PanelSlot = Cast<UQuickSlot>(SkillPanelSlots[idx]);
 		PanelSlot->SkillObject = nullptr;
-		PanelSlot->SetThumbnailImage();
+		PanelSlot->SetDefaultThumbnailImage();
 	}
 }

@@ -80,6 +80,10 @@ void UWeaponListSlot::SetThisWeapon(WEAPONTYPE pWeaponType) {
 	}
 }
 
+void UWeaponListSlot::ResetSelection() {
+	SelectedSlot = nullptr;
+}
+
 void UWeaponListSlot::WidgetLinkOperation() {
 	if (WidgetLink.IsValid()) {
 		auto SkillPanel = Cast<USkillControlUI>(WidgetLink.Get());

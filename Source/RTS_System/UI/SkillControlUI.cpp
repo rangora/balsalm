@@ -47,6 +47,7 @@ void USkillControlUI::NativeConstruct() {
 bool USkillControlUI::OpenOrClose() {
 	if (IsInViewport()) {
 		RemoveFromViewport();
+		UWeaponListSlot::ResetSelection();
 		return false;
 	}
 	else AddToViewport(1);
@@ -170,7 +171,7 @@ void USkillControlUI::GetUnitSkillData(const ABaseMeleeUnit* pUnit, const UGridP
 
 		if (UnitSkillObjects[idx - 1]->GetID() != EMPTY_SKILL_ID) {
 			UI_SkillSlot->SkillObject = UnitSkillObjects[idx - 1];
-			UI_SkillSlot->CurrentTexture = UnitSkillObjects[idx - 1]->SkillAnimMgr->SkillParams->ThumbnailTexture;
+			UI_SkillSlot->CurrentTexture = UnitSkillObjects[idx - 1]->GetThumbnailTexture();
 			UI_SkillSlot->SetThumbnailImage();
 		}
 		else {

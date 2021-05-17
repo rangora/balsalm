@@ -15,6 +15,7 @@ class RTS_SYSTEM_API UCoolDownHandler : public UObject, public FTickableGameObje
 	GENERATED_BODY()
 public:
 	UCoolDownHandler();
+	virtual void PostInitProperties() override;
 	virtual void Tick(float delta) override;
 	virtual TStatId GetStatId() const override;
 

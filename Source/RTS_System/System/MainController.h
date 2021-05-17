@@ -26,6 +26,8 @@ public:
 	void SetSkillPanelVisibility(bool bVisible);
 	void OpenOrCloseSkillPanel();
 
+	bool IsOnlyOneAllyUnitSelected();
+
 	UFUNCTION()
 		void ActiveQuickSlot(int32 idx);
 
@@ -45,8 +47,6 @@ public:
 private:
 	// Input delegate for quick slots.
 	DECLARE_DELEGATE_OneParam(FQuickSlotAction, int32);
-
-	bool IsOnlyOneAllyUnitSelected();
 
 	// User interface class.
 	UPROPERTY()

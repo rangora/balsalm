@@ -6,6 +6,7 @@
 #include "../Units/Component/StatComponent.h"
 #include "../Units/Equipment/BaseWeapon.h"
 #include "../../System/Handler/SkillAnimHandler.h"
+#include "../../System/Handler/SkillObject.h"
 #include "../../DataTable/ABaseSkillTable.h"
 
 
@@ -32,7 +33,7 @@ float UAttackCaculator::CaculateDamage(const AUnit* From, const AUnit* To) {
 float UAttackCaculator::SkillDamage(const AUnit* From, const AUnit* To) {
 	auto Attacker = Cast<ABaseMeleeUnit>(From);
 	
-	auto SkillParamsRef = Attacker->SkillRef->SkillParams;
+	auto SkillParamsRef = Attacker->SkillRef->GetSkillParams();
 	float amount = SkillParamsRef->Variable01;
 	amount += SkillParamsRef->Variable02 * Attacker->UnitStat->currentDamage;
 	amount -= To->UnitStat->Armor;

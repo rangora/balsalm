@@ -11,10 +11,9 @@
  */
 
 class AUnit;
+class USkillObject;
 struct SkillVariable;
 
-
-DECLARE_DELEGATE(FSkillCoolTimeAction);
 
 
 
@@ -28,11 +27,10 @@ public:
 	virtual void CheckSkillRange(AUnit* pUnit);
 	virtual void ActiveSkill(AUnit* pUnit);
 	virtual void SkillAction(AUnit* pUnit);
-	
-	FName Skill_ID;
+	virtual void PlaySkillAnimation(AUnit* pUnit);
 
+
+	FName Skill_ID;
 	// Init in SkillDataHandler. (InitSkillVariable Func)
 	SkillVariable* SkillParams = nullptr;
-
-	FSkillCoolTimeAction SkillCoolTimeAction;
 };

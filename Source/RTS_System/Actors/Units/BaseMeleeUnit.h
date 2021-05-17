@@ -49,7 +49,7 @@ public:
 	void FaceTarget();
 
 	/* Skill system. */
-	void AppointTheSkillTarget(float skillRange, USkillAnimHandler* ActivatedSkill);
+	void AppointTheSkillTarget(float skillRange);
 	void SkillActivator();
 	void SkillAttackCheck();
 
@@ -79,8 +79,6 @@ public:
 	UPROPERTY(EditAnywhere)
 		UDecalComponent* DecalSkillRange;
 
-	UPROPERTY()
-		USkillAnimHandler* SkillRef = nullptr;
 
 	FTimerHandle AttackSpeedTimer;
 

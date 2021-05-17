@@ -22,7 +22,6 @@ void UQuickSlot::GetRefSkillObject(USkillObject* sObject) {
 	}
 	else {
 		SkillObject = sObject;
-		SkillObject->SkillAnimMgr->SkillCoolTimeAction.BindUFunction(this, FName("ActiveCooldown"));
 		CurrentTexture = SkillObject->GetThumbnailTexture();
 		SetThumbnailImage();
 	}

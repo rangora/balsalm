@@ -19,6 +19,7 @@ class AUnit;
 
 
 
+DECLARE_DELEGATE_OneParam(FSkillCoolTimeAction, bool);
 
 
 UCLASS()
@@ -29,26 +30,36 @@ public:
 	void Init();
 	void Clone(USkillObject* SrcObject);
 
+	/* SkillDataHandler. */
+	void SetSkillAnimMgr(USkillAnimHandler* pSkillAnimMgr);
+	void SetSkillParams(SkillVariable* pSkillVariable);
 
-	/* Interaction functions for external modules. */
+
+	/* Functions are binding with SkillAnimMgr. */
+	void SkillActivator(AUnit* pUnit);
+	void CheckSkillRange(AUnit* pUnit);
+	void ActiveSkill(AUnit* pUnit);
+	void SkillAction(AUnit* pUnit);
 	FName GetID();
+	SkillVariable* GetSkillParams();
 	UTexture2D* GetThumbnailTexture();
 
 
-	/* Functions are used for SkillAnimMgr. */
-	virtual void CheckSkillRange(AUnit* pUnit);
-	virtual void ActiveSkill(AUnit* pUnit);
-	virtual void SkillAction(AUnit* pUnit);
-
-
-	/* Values are used for CoolDownMgr. */
+	/* Functions are binding with CoolDownMgr. */
 	UFUNCTION(BlueprintCallable)
 		float GetCoolDownMax();
 	UFUNCTION(BlueprintCallable)
 		float GetCurrentCoolDown();
+	bool bCoolDown();
 
-	UPROPERTY(BlueprintReadwrite)
+	FSkillCoolTimeAction SkillCoolTimeAction;
+
+
+private:
+	UPROPERTY(BlueprintReadwrite, meta = (AllowPrivateAccess = "true"))
 		UCoolDownHandler* CoolDownMgr = nullptr;
 	UPROPERTY()
 		USkillAnimHandler* SkillAnimMgr = nullptr;
+
+	
 };

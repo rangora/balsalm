@@ -16,3 +16,5 @@ void USkillAnimHandler::CheckSkillRange(AUnit* pUnit) {}
 void USkillAnimHandler::ActiveSkill(AUnit* pUnit) {}
 
 void USkillAnimHandler::SkillAction(AUnit* pUnit) {}
+
+void USkillAnimHandler::PlaySkillAnimation(AUnit* pUnit) {}

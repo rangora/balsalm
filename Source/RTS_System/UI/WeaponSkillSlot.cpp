@@ -47,7 +47,8 @@ void UWeaponSkillSlot::DropAction(const UUserWidget* From) {
 		auto FromSlot = Cast<UWeaponSkillSlot>(From);
 
 		if (IsValid(FromSlot->SkillObject)) {
-			if (SkillPanel->UsedWeapon == FromSlot->SkillObject->SkillAnimMgr->SkillParams->WeaponType) {
+			auto pSkillParams = FromSlot->SkillObject->GetSkillParams();
+			if (SkillPanel->UsedWeapon == pSkillParams->WeaponType) {
 				OverWrite(FromSlot);
 			}
 		}

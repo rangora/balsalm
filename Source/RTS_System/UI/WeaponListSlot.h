@@ -25,6 +25,9 @@ public:
 	void bBorderImageVisible(bool visibility);
 	void SetThisWeapon(WEAPONTYPE pWeaponType);
 
+	static void ResetSelection();
+
+
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget))
 		UImage* BorderImage;
 

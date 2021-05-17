@@ -9,12 +9,14 @@
 
 
 class UFogRegister;
+class USkillObject;
 class UStatComponent;
 class UAStarComponent;
 class UDecoComponent;
 class UHeadUpHPbar;
-class ABaseWeapon;
 class UAnimInstance;
+class ABaseWeapon;
+
 
 
 UCLASS()
@@ -41,6 +43,9 @@ public:
 
 	UPROPERTY()
 		AUnit* TargetUnit;
+
+	UPROPERTY()
+		USkillObject* SkillRef = nullptr;
 
 	ABaseWeapon* Weapon;
 

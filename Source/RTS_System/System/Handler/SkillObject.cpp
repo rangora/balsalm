@@ -16,11 +16,28 @@ USkillObject::USkillObject() {
 	CoolDownMgr = NewObject<UCoolDownHandler>();
 }
 
-void USkillObject::CheckSkillRange(AUnit* pUnit) {}
+void USkillObject::SkillActivator(AUnit* pUnit) {
+	SkillAnimMgr->ActiveSkill(pUnit);
+}
 
-void USkillObject::ActiveSkill(AUnit* pUnit) {}
+void USkillObject::CheckSkillRange(AUnit* pUnit) {
+	SkillAnimMgr->CheckSkillRange(pUnit);
+}
 
-void USkillObject::SkillAction(AUnit* pUnit) {}
+void USkillObject::ActiveSkill(AUnit* pUnit) {
+	SkillAnimMgr->ActiveSkill(pUnit);
+}
+
+void USkillObject::SkillAction(AUnit* pUnit) {
+	if (SkillCoolTimeAction.IsBound()) {
+		SkillAnimMgr->PlaySkillAnimation(pUnit);
+		SkillCoolTimeAction.Execute(true);
+	}
+}
+
+SkillVariable* USkillObject::GetSkillParams() {
+	return SkillAnimMgr->SkillParams;
+}
 
 void USkillObject::Init() {
 	CoolDownMgr->coolDownMax = 0.f;
@@ -32,12 +49,23 @@ void USkillObject::Init() {
 
 void USkillObject::Clone(USkillObject* SrcObject) {
 	CoolDownMgr = NewObject<UCoolDownHandler>();
-	SkillAnimMgr = SrcObject->SkillAnimMgr;
-	CoolDownMgr->coolDownMax = SkillAnimMgr->SkillParams->Variable05;
-	CoolDownMgr->currentCoolDown = SrcObject->CoolDownMgr->currentCoolDown;
-	
-	auto bCoolDown = SrcObject->CoolDownMgr->IsCoolDown();
-	CoolDownMgr->CoolDownTrigger(bCoolDown);
+
+	if (SrcObject->GetID() == EMPTY_SKILL_ID) {
+		SkillAnimMgr = nullptr;
+	}
+	else {
+		SkillAnimMgr = SrcObject->SkillAnimMgr;
+		CoolDownMgr->coolDownMax = SkillAnimMgr->SkillParams->Variable05;
+		SkillCoolTimeAction.BindUFunction(CoolDownMgr, FName("CoolDownTrigger"));
+	}
+}
+
+void USkillObject::SetSkillAnimMgr(USkillAnimHandler* pSkillAnimMgr) {
+	SkillAnimMgr = pSkillAnimMgr;
+}
+
+void USkillObject::SetSkillParams(SkillVariable* pSkillVariable) {
+	SkillAnimMgr->SkillParams = pSkillVariable;
 }
 
 FName USkillObject::GetID() {
@@ -51,6 +79,8 @@ UTexture2D* USkillObject::GetThumbnailTexture() {
 	return output;
 }
 
+
+
 float USkillObject::GetCoolDownMax() {
 	if(IsValid(SkillAnimMgr))
 		return SkillAnimMgr->SkillParams->Variable05;
@@ -59,4 +89,8 @@ float USkillObject::GetCoolDownMax() {
 
 float USkillObject::GetCurrentCoolDown() {
 	return CoolDownMgr->currentCoolDown;
+}
+
+bool USkillObject::bCoolDown() {
+	return CoolDownMgr->IsCoolDown();
 }

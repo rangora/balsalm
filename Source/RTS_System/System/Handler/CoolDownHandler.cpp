@@ -2,12 +2,17 @@
 
 
 #include "CoolDownHandler.h"
+#include "SkillAnimHandler.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/Engine.h"
 
 
 UCoolDownHandler::UCoolDownHandler() {
 	coolDownMax = currentCoolDown = 0.f;
+}
+
+void UCoolDownHandler::PostInitProperties() {
+	Super::PostInitProperties();
 }
 
 void UCoolDownHandler::Tick(float delta) {

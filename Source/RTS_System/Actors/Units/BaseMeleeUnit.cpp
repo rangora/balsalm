@@ -6,6 +6,7 @@
 #include "Component/StatComponent.h"
 #include "Component/AstarComponent.h"
 #include "Component/ArmStatComponent.h"
+#include "Component/DecoComponent.h"
 #include "Equipment/BaseWeapon.h"
 #include "Animation/MeleeAnimInstance.h"
 #include "../../ActorType.h"
@@ -14,6 +15,7 @@
 #include "../../System/Handler/SkillObject.h"
 #include "../../System/Handler/SkillAnimHandler.h"
 #include "../../UI/MainHUD.h"
+#include "../../UI/ScreenUI.h"
 #include "../Misc/AttackCaculator.h"
 
 
@@ -173,7 +175,7 @@ void ABaseMeleeUnit::FaceTarget() {
 	}
 }
 
-void ABaseMeleeUnit::AppointTheSkillTarget(float skillRange, USkillAnimHandler* ActivatedSkill) {
+void ABaseMeleeUnit::AppointTheSkillTarget(float skillRange) {
 	// Show skill range.	
 	auto NewSkillSize = DecalSkillRange->DecalSize;
 	NewSkillSize.Y = skillRange;
@@ -181,7 +183,6 @@ void ABaseMeleeUnit::AppointTheSkillTarget(float skillRange, USkillAnimHandler* 
 	DecalSkillRange->DecalSize = NewSkillSize;
 
 	skillRadius = skillRange;
-	SkillRef = ActivatedSkill;
 	ShowSkillRadius(true);
 	RequiredTargeting();
 
@@ -240,10 +241,13 @@ void ABaseMeleeUnit::ShowSkillRadius(bool bShow) {
 }
 
 void ABaseMeleeUnit::SkillTargetingFinish() {
-	_behavior_mutex.Lock();
-	TurnOnBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER);
 	TurnOffBehavior(UNIT_BEHAVIOR::SKILL_TARGETING);
-	_behavior_mutex.Unlock();
+
+	// Can't be target is myself.
+	if (TargetUnit == this) return;
+	
+	TurnOnBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER);
+	
 
 	// Move to location.
 	FVector TargetLocation;
@@ -331,6 +335,27 @@ void ABaseMeleeUnit::AttackAvailable() {
 }
 
 void ABaseMeleeUnit::DeadProcess() {
+	GetMesh()->SetCollisionProfileName(FName("NoCollision"));
 	bGoBasicAnimInstance = true;
 	DefaultAnimInstance->bDead = true;
+
+	_behavior_mutex.Lock();
+	Behavior = UNIT_BEHAVIOR::NOTHING;
+	_behavior_mutex.Unlock();
+
+	// Set docoes unvisibility.
+	Deco->SelectionMeshRef->SetVisibility(false);
+	Deco->HeadUpHPbarRef->SetVisibility(false);
+
+
+	// Clear skill HUD if selected a ally unit.
+	auto IController = Cast<AMainController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (IsValid(IController)) {
+		if (IController->IsOnlyOneAllyUnitSelected()) {
+			
+			if (IController->Units[0] == this) {
+				IController->SetSkillPanelVisibility(false);
+			}
+		}
+	}
 }

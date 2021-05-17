@@ -22,9 +22,11 @@ class RTS_SYSTEM_API UAxe_SkullCrash : public USkillAnimHandler {
 public:
 	UAxe_SkullCrash();
 	
+	/* A parameter, pUnit caller these functions. */
 	void CheckSkillRange(AUnit* pUnit) override;
 	void ActiveSkill(AUnit* pUnit) override;
-	void SkillAction(AUnit* pUnit) override;
+	void PlaySkillAnimation(AUnit* pUnit) override;
+
 
 	UPROPERTY()
 		UAxeSkillAnimInstance* AxeSkillAnimInstance;

@@ -2,6 +2,7 @@
 
 
 #include "Axe_SkullCrash.h"
+#include "CoolDownHandler.h"
 #include "../../Actors/Units/Animation/AxeSkillAnimInstance.h"
 #include "../../Actors/Units/BaseMeleeUnit.h"
 #include "../../DataTable/ABaseSkillTable.h"
@@ -24,7 +25,7 @@ void UAxe_SkullCrash::CheckSkillRange(AUnit* pUnit) {
 
 	auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
 
-	IUnit->AppointTheSkillTarget(skill_range, this);
+	IUnit->AppointTheSkillTarget(skill_range);
 }
 
 void UAxe_SkullCrash::ActiveSkill(AUnit* pUnit) {
@@ -36,7 +37,8 @@ void UAxe_SkullCrash::ActiveSkill(AUnit* pUnit) {
 	}
 }
 
-void UAxe_SkullCrash::SkillAction(AUnit* pUnit) {
+
+void UAxe_SkullCrash::PlaySkillAnimation(AUnit* pUnit) {
 	auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
 
 	IUnit->GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
@@ -46,12 +48,6 @@ void UAxe_SkullCrash::SkillAction(AUnit* pUnit) {
 	auto AxeAnim = Cast<UAxeSkillAnimInstance>(pAnim);
 
 	if (IsValid(AxeAnim)) {
-		if (SkillCoolTimeAction.IsBound()) {
-			SkillCoolTimeAction.Execute();
-			IUnit->TurnOffBehavior(UNIT_BEHAVIOR::MOVABLE);
-			AxeAnim->PlaySkullCrack();
-		}
-		else 
-			GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Red, TEXT("SkillCoolTimeAction unbind"));
+		AxeAnim->PlaySkullCrack();
 	}
 }
