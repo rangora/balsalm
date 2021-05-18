@@ -46,8 +46,9 @@ void ABaseMeleeUnit::Tick(float delta) {
 	Super::Tick(delta);
 
 	if (CheckBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER)) BasicAttack();
-	if (bGoBasicAnimInstance) SetBasicAnimInstance();
 	if (CheckBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER)) SkillActivator();
+	if (bGoBasicAnimInstance) SetBasicAnimInstance();
+	
 }
 
 void ABaseMeleeUnit::BeginPlay() {
@@ -109,7 +110,7 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 				|| (DesiredTargetUnit->UnitStat->DeadOrAlive == DOA::DEAD)) return;
 
 			// If the unit is a foe, set as target.
-			if (IMode->player_Team_Number != DesiredTargetUnit->unit_Team_Number) {
+			if (IMode->player_Team_Number == DesiredTargetUnit->unit_Team_Number) {
 				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("unit"));
 
 
@@ -123,7 +124,7 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 			}
 		}
 
-		//  Movement order. Turn off other flag.
+		//  Clicked somewhere is located place.
 		else {
 			TargetUnit = nullptr;
 			if(CheckBehavior(UNIT_BEHAVIOR::ATTACKING))
@@ -136,6 +137,13 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 			Astar->MoveToLocation(RB_Vector);
 		}
 	}
+}
+
+void ABaseMeleeUnit::FollowTarget() {
+	if (IsValid(TargetUnit) && CheckBehavior(UNIT_BEHAVIOR::MOVABLE)) {
+		Astar->MoveToLocation(TargetUnit->GetActorLocation());
+	}
+	else StopMovement();	
 }
 
 void ABaseMeleeUnit::StopMovement() {
@@ -166,6 +174,7 @@ void ABaseMeleeUnit::BasicAttack() {
 			AfterAttack();
 		}
 	}
+	else FollowTarget();
 }
 
 void ABaseMeleeUnit::FaceTarget() {
@@ -190,10 +199,8 @@ void ABaseMeleeUnit::AppointTheSkillTarget(float skillRange) {
 }
 
 void ABaseMeleeUnit::SkillActivator() {
-	if (!IsValid(TargetUnit)) {
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("non-SkillActivator"));
-		return;
-	}
+	// Check target validation.
+	if (!IsValid(TargetUnit)) return;
 
 	float distance = FVector::Distance(TargetUnit->GetActorLocation(), GetActorLocation());
 
@@ -209,6 +216,7 @@ void ABaseMeleeUnit::SkillActivator() {
 			_behavior_mutex.Unlock();
 		}
 	}
+	else FollowTarget();
 }
 
 void ABaseMeleeUnit::SkillAttackCheck() {
@@ -335,6 +343,7 @@ void ABaseMeleeUnit::AttackAvailable() {
 }
 
 void ABaseMeleeUnit::DeadProcess() {
+	StopMovement();
 	GetMesh()->SetCollisionProfileName(FName("NoCollision"));
 	bGoBasicAnimInstance = true;
 	DefaultAnimInstance->bDead = true;

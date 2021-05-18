@@ -22,6 +22,7 @@ class USkillAnimHandler;
 enum class UNIT_BEHAVIOR {
 	NOTHING,
 	MOVABLE,
+	FOLLOW_TARGET,
 	BASICATTACK_ORDER,
 	ATTACK_AVAILABLE,
 	ATTACKING,
@@ -44,6 +45,7 @@ public:
 	// Mouse right button action.
 	virtual void Interaction_Implementation(const FVector& RB_Vector, AActor* Target);
 
+	void FollowTarget();
 	void StopMovement();
 	void BasicAttack();
 	void FaceTarget();

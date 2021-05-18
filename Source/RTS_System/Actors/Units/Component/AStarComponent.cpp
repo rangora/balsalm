@@ -69,16 +69,12 @@ void UAStarComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 void UAStarComponent::MoveToLocation(const FVector& LocationValue) {
 	auto InWorld = GetWorld();
 	LocationArray.Empty();
-
-	for (auto Element : PathSpheres) {
-		if (IsValid(Element) && !Element->IsPendingKill())
-			Element->Destroy();
-	}
 	PathSpheres.Reset();
 
 	Core->Find(GetOwner()->GetActorLocation(), LocationValue, LocationArray, InWorld);
 
 	if (LocationArray.Num()) {
+		LocationArray.Pop();
 		bMoving = bNextStep = bNeedToGo = true;
 	}
 }

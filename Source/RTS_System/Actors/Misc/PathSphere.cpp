@@ -4,11 +4,11 @@
 #include "PathSphere.h"
 #include "Engine.h"
 
-// Sets default values
+// Sets default values(24)
 APathSphere::APathSphere() {
 	PrimaryActorTick.bCanEverTick = false;
 	DestSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DestSphere"));
-	DestSphere->SetSphereRadius(24.f);
+	DestSphere->SetSphereRadius(5.f);
 	DestSphere->SetCollisionProfileName(TEXT("Trigger"));
 	RootComponent = DestSphere;
 }

@@ -57,6 +57,14 @@ struct FNodeList {
 			});
 	}
 
+	void SetNodeMapRef(TMap<int32, FNode>& ArgNodeMap) {
+		NodeMapRef = ArgNodeMap;
+	}
+
+	void Clear() {
+		IndexList.Empty();
+	}
+
 	int HeapPop() {
 		int outputIndex = -1;
 
@@ -84,8 +92,6 @@ struct FNodeList {
 
 
 struct FGraph {
-	typedef int FNodeRef;
-
 	TSet<FNode> NodeSet;
 	TMap<int32, FNode> NodeMap;
 	TArray<FVector> Direction;
@@ -295,14 +301,8 @@ struct FGraph {
 	void Reset() {
 		NodeMap.Reset();
 		NodeSet.Reset();
-		delete OpenList;
-		delete CloseList;
-		OpenList = new FNodeList(NodeMap);
-		CloseList = new FNodeList(NodeMap);
-		OpenList->IndexList.Reserve(POOLSIZE);
-		CloseList->IndexList.Reserve(POOLSIZE);
-		NodeMap.Reserve(POOLSIZE);
-		NodeSet.Reserve(POOLSIZE);
+		OpenList->Clear();
+		CloseList->Clear();
 	}
 
 	void CreateDirection() {
@@ -330,7 +330,9 @@ public:
 
 	void Reset(UWorld* InWorld) {
 		Graph.InWorld = InWorld;
+		_resetMutex.Lock();
 		Graph.Reset();
+		_resetMutex.Unlock();
 	}
 
 	void Find(FVector StartPos, FVector EndPos, TArray<FVector>& PathVector, UWorld* InWorld) {
@@ -362,4 +364,5 @@ public:
 	}
 
 	FGraph Graph;
+	FCriticalSection _resetMutex;
 };

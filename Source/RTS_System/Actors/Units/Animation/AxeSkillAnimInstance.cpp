@@ -29,7 +29,6 @@ UAxeSkillAnimInstance::UAxeSkillAnimInstance() {
 void UAxeSkillAnimInstance::PlaySkullCrack() {
 	auto aUnit = Cast<ABaseMeleeUnit>(GetOwningActor());
 	aUnit->TurnOffBehavior(UNIT_BEHAVIOR::MOVABLE);
-
 	Montage_Play(SkullCrackMontage, 1.7f);
 }
 
@@ -41,6 +40,7 @@ void UAxeSkillAnimInstance::AnimNotify_SkillEnd() {
 	auto aUnit = Cast<ABaseMeleeUnit>(GetOwningActor());
 
 	if (IsValid(aUnit)) {
+		aUnit->TargetUnit = nullptr;
 		aUnit->bGoBasicAnimInstance = true;
 		aUnit->TurnOffBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE);
 		aUnit->TurnOnBehavior(UNIT_BEHAVIOR::MOVABLE);

@@ -14,7 +14,10 @@ UMeleeAnimInstance::UMeleeAnimInstance() {
 }
 
 void UMeleeAnimInstance::PlayBasicAttack() {
-	Montage_Play(BasicAttackMontage, 1.5f);
+	auto IUnit = Cast<ABaseMeleeUnit>(GetOwningActor());
+	IUnit->TurnOffBehavior(UNIT_BEHAVIOR::MOVABLE);
+	IUnit->StopMovement();
+	Montage_Play(BasicAttackMontage, 1.8f);
 }
 
 void UMeleeAnimInstance::AnimNotify_AttackHit() {
@@ -25,6 +28,8 @@ void UMeleeAnimInstance::AnimNotify_AttackHit() {
 
 void UMeleeAnimInstance::AnimNotify_AttackEnd() {
 	auto IUnit = Cast<ABaseMeleeUnit>(GetOwningActor());
-	if (IsValid(IUnit)) 
+	if (IsValid(IUnit)) {
+		IUnit->TurnOnBehavior(UNIT_BEHAVIOR::MOVABLE);
 		IUnit->TurnOffBehavior(UNIT_BEHAVIOR::ATTACKING);
+	}
 }
