@@ -3,6 +3,7 @@
 
 #include "Axe_SkullCrash.h"
 #include "CoolDownHandler.h"
+#include "../../UI/MainHUD.h"
 #include "../../Actors/Units/Animation/AxeSkillAnimInstance.h"
 #include "../../Actors/Units/BaseMeleeUnit.h"
 #include "../../DataTable/ABaseSkillTable.h"
@@ -19,13 +20,24 @@ UAxe_SkullCrash::UAxe_SkullCrash() {
 }
 
 void UAxe_SkullCrash::CheckSkillRange(AUnit* pUnit) {
-	float skillBasicAttack_amount = SkillParams->Variable01;
-	float skillAttack_rate = SkillParams->Variable02;
+	auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
+	auto IController = UGameplayStatics::GetPlayerController(pUnit->GetWorld(), 0);
+	auto IHUD = Cast<AMainHUD>(IController->GetHUD());
+
 	float skill_range = SkillParams->Variable03;
 
-	auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
+	// Set skill decal size.
+	FVector NewSkillSize = IUnit->DecalSkillRange->DecalSize;
+	NewSkillSize.Y = skill_range;
+	NewSkillSize.Z = skill_range;
+	IUnit->DecalSkillRange->DecalSize = NewSkillSize;
+	IUnit->skillRadius = skill_range;
 
-	IUnit->AppointTheSkillTarget(skill_range);
+	// Show skill radius.
+	IUnit->DecalSkillRange->SetVisibility(true);
+	IUnit->TurnOnBehavior(UNIT_BEHAVIOR::SKILL_TARGETING);
+
+	IHUD->SetMouseLeftButtonAction(LeftButtonAction::TARGETING);
 }
 
 void UAxe_SkullCrash::ActiveSkill(AUnit* pUnit) {
@@ -36,7 +48,6 @@ void UAxe_SkullCrash::ActiveSkill(AUnit* pUnit) {
 		CheckSkillRange(IUnit);
 	}
 }
-
 
 void UAxe_SkullCrash::PlaySkillAnimation(AUnit* pUnit) {
 	auto IUnit = Cast<ABaseMeleeUnit>(pUnit);

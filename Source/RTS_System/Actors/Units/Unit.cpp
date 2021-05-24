@@ -16,10 +16,15 @@
 #include "Runtime/Engine/Public/EngineUtils.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 
+
+
+
+
+
 AUnit::AUnit() 
-	: unit_Team_Number(1),
-	TargetUnit(nullptr) {
+	: unit_Team_Number(1) {
 	PrimaryActorTick.bCanEverTick = true;
+	TargetUnits.Add(nullptr);
 
 	SelectionMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SelectionMesh"));
 	SelectionMesh->SetupAttachment(GetMesh());
@@ -69,6 +74,7 @@ float AUnit::TakeDamage(float damageAmount, FDamageEvent const& DamageEvent, ACo
 void AUnit::Interaction_Implementation(const FVector& RB_Vector, AActor* Target) {}
 
 void AUnit::AttackCheck() {
+	auto TargetUnit = TargetUnits[0];
 	if (IsValid(TargetUnit)) {
 		float amount = UAttackCaculator::CaculateDamage(this, TargetUnit);
 		FDamageEvent DamageEvent;
@@ -79,5 +85,5 @@ void AUnit::AttackCheck() {
 void AUnit::SetTargetUnit(AUnit* pUnit) {
 	if (IsValid(pUnit)) 
 		if(pUnit->UnitStat->DeadOrAlive == DOA::ALIVE)
-			TargetUnit = pUnit;
+			TargetUnits[0] = pUnit;
 }

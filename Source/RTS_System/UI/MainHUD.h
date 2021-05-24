@@ -15,6 +15,15 @@ class UUserWidget;
 class AUnit;
 
 
+UENUM(BlueprintType)
+enum class LeftButtonAction :uint8 {
+	NONE	  UMETA(DisplayName = "NONE"),
+	DRAG	  UMETA(DisplayName = "DRAG"),
+	TARGETING UMETA(DisplayName = "TARGETING"),
+	SKILLAREA UMETA(DisplayName = "SKILLAREA")
+};
+
+
 UCLASS()
 class RTS_SYSTEM_API AMainHUD : public AHUD {
 	GENERATED_BODY()
@@ -29,6 +38,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void MouseLeftButtonActionSwitcher();
 
+	UFUNCTION(BlueprintCallable)
+		void SetMouseLeftButtonAction(LeftButtonAction Action);
+
 	void SetDragable(bool bDrag);
 
 	UPROPERTY()
@@ -38,11 +50,16 @@ private:
 	UPROPERTY()
 		TSubclassOf<UUserWidget> ScreenUIClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+		LeftButtonAction CurrentAction;
+
 	FCriticalSection _mutex;
 
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 		bool bDragable = true;
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 		bool bTargeting = false;
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+		bool bSkillAreaDirection = false;
 
 };

@@ -32,6 +32,8 @@ enum class UNIT_BEHAVIOR {
 };
 
 
+
+
 UCLASS()
 class RTS_SYSTEM_API ABaseMeleeUnit : public AUnit {
 	GENERATED_BODY()
@@ -50,10 +52,11 @@ public:
 	void BasicAttack();
 	void FaceTarget();
 
+
 	/* Skill system. */
-	void AppointTheSkillTarget(float skillRange);
 	void SkillActivator();
 	void SkillAttackCheck();
+
 
 	/* Behavior controller. */
 	bool CheckBehavior(UNIT_BEHAVIOR var);
@@ -61,9 +64,10 @@ public:
 	void TurnOffBehavior(UNIT_BEHAVIOR var);
 	
 	UFUNCTION(BlueprintCallable)
-		void ShowSkillRadius(bool bShow);
-	UFUNCTION(BlueprintCallable)
 		void SkillTargetingFinish();
+	UFUNCTION(BlueprintCallable)
+		void TurnOffSkillRange();
+
 
 	UFUNCTION()
 		void SetBasicAnimInstance();
@@ -75,21 +79,19 @@ public:
 		UMeleeAnimInstance* DefaultAnimInstance;
 	UPROPERTY()
 		UArmStatComponent* ArmStatComponent;
-
-	UPROPERTY()
-		USphereComponent* SkillRadius;
 	UPROPERTY(EditAnywhere)
 		UDecalComponent* DecalSkillRange;
-
+	UPROPERTY(EditAnywhere)
+		UDecalComponent* SkillAreaRange;
 
 	FTimerHandle AttackSpeedTimer;
 
 	float skillRadius;
 	bool bGoBasicAnimInstance = false;
+	bool bShowSkillArea = false;
 
 private:
 	// Get target info from mainHUD.
-	void RequiredTargeting();
 	void AfterAttack();
 	void AttackAvailable();
 

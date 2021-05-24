@@ -3,9 +3,11 @@
 
 #include "AxeSkillAnimInstance.h"
 #include "MeleeAnimInstance.h"
+#include "Engine/Engine.h"
 #include "../BaseMeleeUnit.h"
 #include "../Equipment/BaseWeapon.h"
-#include "Engine/Engine.h"
+#include "../../../System/Handler/SkillObject.h"
+
 
 
 UAxeSkillAnimInstance::UAxeSkillAnimInstance() {
@@ -33,14 +35,17 @@ void UAxeSkillAnimInstance::PlaySkullCrack() {
 }
 
 void UAxeSkillAnimInstance::PlayCycloneAxe() {
-	Montage_Play(CycloneAxeMontage, 1.f);
+	auto aUnit = Cast<ABaseMeleeUnit>(GetOwningActor());
+	aUnit->TurnOnBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE);
+	aUnit->TurnOffBehavior(UNIT_BEHAVIOR::MOVABLE);
+	Montage_Play(CycloneAxeMontage, 1.7f);
 }
 
 void UAxeSkillAnimInstance::AnimNotify_SkillEnd() {
 	auto aUnit = Cast<ABaseMeleeUnit>(GetOwningActor());
 
 	if (IsValid(aUnit)) {
-		aUnit->TargetUnit = nullptr;
+		aUnit->TargetUnits[0] = nullptr;
 		aUnit->bGoBasicAnimInstance = true;
 		aUnit->TurnOffBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE);
 		aUnit->TurnOnBehavior(UNIT_BEHAVIOR::MOVABLE);
@@ -52,5 +57,12 @@ void UAxeSkillAnimInstance::AnimNotify_SkullCrackHit() {
 	if (IsValid(aUnit)) {
 		aUnit->Weapon->ActiveHitParticle(SkillCrack_Hit);
 		aUnit->SkillAttackCheck();
+	}
+}
+
+void UAxeSkillAnimInstance::AnimNotify_CycloneAxeHit() {
+	auto aUnit = Cast<ABaseMeleeUnit>(GetOwningActor());
+	if (IsValid(aUnit)) {
+		aUnit->SkillRef->AreaSkillJudge(aUnit);
 	}
 }

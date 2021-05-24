@@ -15,6 +15,8 @@ void USkillAnimHandler::CheckSkillRange(AUnit* pUnit) {}
 
 void USkillAnimHandler::ActiveSkill(AUnit* pUnit) {}
 
-void USkillAnimHandler::SkillAction(AUnit* pUnit) {}
+void USkillAnimHandler::AreaSkillJudge(AUnit* pUnit) {}
 
 void USkillAnimHandler::PlaySkillAnimation(AUnit* pUnit) {}
+
+void USkillAnimHandler::ShowSkillArea(AUnit* pUnit, FVector CursorLocation) {}

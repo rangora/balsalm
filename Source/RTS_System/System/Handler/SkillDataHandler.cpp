@@ -74,6 +74,7 @@ void USkillDataHandler::SkillTableCreate() {
 	TArray<USkillAnimHandler*> SkillAnimArray;
 	SkillAnimArray.Add(NewObject<UAxe_SkullCrash>());
 	SkillAnimArray.Add(NewObject<UAxe_DualStrike>());
+	SkillAnimArray.Add(NewObject<UAxe_CycloneAxe>());
 	
 	for (int i = 0; i < SkillAnimArray.Num(); i++) {
 		AxeSkills.Add(NewObject<USkillObject>());

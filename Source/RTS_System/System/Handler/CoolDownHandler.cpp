@@ -11,10 +11,6 @@ UCoolDownHandler::UCoolDownHandler() {
 	coolDownMax = currentCoolDown = 0.f;
 }
 
-void UCoolDownHandler::PostInitProperties() {
-	Super::PostInitProperties();
-}
-
 void UCoolDownHandler::Tick(float delta) {
 	if (bCoolDown) {
 		currentCoolDown = UKismetMathLibrary::FInterpTo_Constant(currentCoolDown, coolDownMax, delta, 1.0f);

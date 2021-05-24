@@ -15,6 +15,7 @@
 #include "../System/Handler/CoolDownHandler.h"
 #include "../System/Handler/AllSkill.h"
 #include "../ActorType.h"
+#include "../DataTable/ABaseSkillTable.h"
 #include "UMG/Public/Components/GridPanel.h"
 
 
@@ -73,13 +74,16 @@ void AMainController::OpenOrCloseSkillPanel() {
 			// UI open action.
 			if (SkillUI->OpenOrClose()) {
 				SkillUI->UnitSkillConnector(ControllableUnit, true);				
-				MainHUD->SetDragable(false);
+				MainHUD->SetMouseLeftButtonAction(LeftButtonAction::NONE);
+				//MainHUD->SetDragable(false);
 			}
 			// UI close action.
 			else {
 				SkillUI->UnitSkillConnector(ControllableUnit, false);
 				SkillUI->Clear();
-				MainHUD->SetDragable(true);
+				MainHUD->SetMouseLeftButtonAction(LeftButtonAction::DRAG);
+
+				//MainHUD->SetDragable(true);
 
 				auto pScreenWidget = Cast<UScreenUI>(MainHUD->ScreenUIWidget);
 				pScreenWidget->UpdateSkillSlots(Units[0]);
@@ -111,7 +115,8 @@ void AMainController::ActiveQuickSlot(int32 idx) {
 
 
 			if (IsValid(UnitSkillObject)) {
-				Units[0]->SkillRef = UnitSkillObject;
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("ActiveQuickSlot"));
+				Units[0]->SkillRef = UnitSkillObject;				
 				UnitSkillObject->SkillActivator(Units[0]);
 			}
 		}

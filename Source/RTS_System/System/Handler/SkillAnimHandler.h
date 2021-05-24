@@ -25,10 +25,16 @@ public:
 	USkillAnimHandler();
 
 	virtual void CheckSkillRange(AUnit* pUnit);
+	/* It to be Called first by controller. */
 	virtual void ActiveSkill(AUnit* pUnit);
-	virtual void SkillAction(AUnit* pUnit);
+	
+	/* Called by HUD. */
+	virtual void ShowSkillArea(AUnit* pUnit, FVector CursorLocation);
+	
 	virtual void PlaySkillAnimation(AUnit* pUnit);
+	virtual void AreaSkillJudge(AUnit* pUnit);
 
+	
 
 	FName Skill_ID;
 	// Init in SkillDataHandler. (InitSkillVariable Func)

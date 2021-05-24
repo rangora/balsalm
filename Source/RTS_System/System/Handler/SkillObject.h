@@ -15,7 +15,9 @@ struct SkillVariable;
 class UAnimInstance;
 class UCoolDownHandler;
 class USkillAnimHandler;
+class USkillHelper;
 class AUnit;
+class ABaseMeleeUnit;
 
 
 
@@ -38,8 +40,19 @@ public:
 	/* Functions are binding with SkillAnimMgr. */
 	void SkillActivator(AUnit* pUnit);
 	void CheckSkillRange(AUnit* pUnit);
-	void ActiveSkill(AUnit* pUnit);
-	void SkillAction(AUnit* pUnit);
+	
+	UFUNCTION(BlueprintCallable)
+		void ShowSkillArea(AUnit* pUnit, FVector CursorLocation);
+	
+	UFUNCTION(BlueprintCallable)
+		void SkillAction(AUnit* pUnit);
+	
+	void AreaSkillJudge(AUnit* pUnit);
+
+	/* Internerally called in skill action function. */
+	UFUNCTION(BlueprintCallable)
+		void PlaySkillAnimation(AUnit* pUnit);
+
 	FName GetID();
 	SkillVariable* GetSkillParams();
 	UTexture2D* GetThumbnailTexture();
@@ -52,6 +65,7 @@ public:
 		float GetCurrentCoolDown();
 	bool bCoolDown();
 
+
 	FSkillCoolTimeAction SkillCoolTimeAction;
 
 
@@ -60,6 +74,7 @@ private:
 		UCoolDownHandler* CoolDownMgr = nullptr;
 	UPROPERTY()
 		USkillAnimHandler* SkillAnimMgr = nullptr;
-
+	UPROPERTY()
+		USkillHelper* SkillHelper = nullptr;
 	
 };

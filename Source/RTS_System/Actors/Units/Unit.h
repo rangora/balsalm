@@ -42,9 +42,9 @@ public:
 		int unit_Team_Number;
 
 	UPROPERTY()
-		AUnit* TargetUnit;
+		TArray<AUnit*> TargetUnits;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		USkillObject* SkillRef = nullptr;
 
 	ABaseWeapon* Weapon;

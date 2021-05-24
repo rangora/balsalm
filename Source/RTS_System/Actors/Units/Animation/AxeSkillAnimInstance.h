@@ -25,7 +25,8 @@ public:
 		void AnimNotify_SkillEnd();
 	UFUNCTION()
 		void AnimNotify_SkullCrackHit();
-
+	UFUNCTION()
+		void AnimNotify_CycloneAxeHit();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AxeSkill)
 		UAnimMontage* SkullCrackMontage;

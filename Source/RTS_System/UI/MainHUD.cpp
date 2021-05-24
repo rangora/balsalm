@@ -17,6 +17,7 @@ AMainHUD::AMainHUD() {
 		TEXT("/Game/UI/BP_ScreenUI.BP_ScreenUI_C"));
 	if (ScreenUI_C.Succeeded())
 		ScreenUIClass = ScreenUI_C.Class;
+	CurrentAction = LeftButtonAction::DRAG;
 }
 
 void AMainHUD::DrawHUD() {
@@ -25,6 +26,8 @@ void AMainHUD::DrawHUD() {
 
 void AMainHUD::BeginPlay() {
 	Super::BeginPlay();
+	
+	
 
 	if (ScreenUIClass) {
 		ScreenUIWidget = CreateWidget<UUserWidget>(GetWorld(), ScreenUIClass);
@@ -62,6 +65,10 @@ void AMainHUD::MouseLeftButtonActionSwitcher() {
 		bTargeting = false;
 	}
 	_mutex.Unlock();
+}
+
+void AMainHUD::SetMouseLeftButtonAction(LeftButtonAction Action) {
+	CurrentAction = Action;
 }
 
 void AMainHUD::SetDragable(bool bDrag) {

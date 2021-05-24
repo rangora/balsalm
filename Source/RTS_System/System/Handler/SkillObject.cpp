@@ -4,6 +4,7 @@
 #include "SkillObject.h"
 #include "CoolDownHandler.h"
 #include "SkillAnimHandler.h"
+#include "SkillHelper.h"
 #include "Engine/Engine.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "../../ActorType.h"
@@ -14,6 +15,7 @@
 
 USkillObject::USkillObject() {
 	CoolDownMgr = NewObject<UCoolDownHandler>();
+	SkillHelper = NewObject<USkillHelper>();
 }
 
 void USkillObject::SkillActivator(AUnit* pUnit) {
@@ -24,15 +26,15 @@ void USkillObject::CheckSkillRange(AUnit* pUnit) {
 	SkillAnimMgr->CheckSkillRange(pUnit);
 }
 
-void USkillObject::ActiveSkill(AUnit* pUnit) {
-	SkillAnimMgr->ActiveSkill(pUnit);
-}
-
 void USkillObject::SkillAction(AUnit* pUnit) {
 	if (SkillCoolTimeAction.IsBound()) {
 		SkillAnimMgr->PlaySkillAnimation(pUnit);
 		SkillCoolTimeAction.Execute(true);
 	}
+}
+
+void USkillObject::AreaSkillJudge(AUnit* pUnit) {
+	SkillAnimMgr->AreaSkillJudge(pUnit);
 }
 
 SkillVariable* USkillObject::GetSkillParams() {
@@ -68,6 +70,14 @@ void USkillObject::SetSkillParams(SkillVariable* pSkillVariable) {
 	SkillAnimMgr->SkillParams = pSkillVariable;
 }
 
+void USkillObject::ShowSkillArea(AUnit* pUnit, FVector CursorLocation) {
+	SkillAnimMgr->ShowSkillArea(pUnit, CursorLocation);
+}
+
+void USkillObject::PlaySkillAnimation(AUnit* pUnit) {
+	SkillAnimMgr->PlaySkillAnimation(pUnit);
+}
+
 FName USkillObject::GetID() {
 	if(IsValid(SkillAnimMgr))
 		return SkillAnimMgr->Skill_ID;
@@ -94,3 +104,4 @@ float USkillObject::GetCurrentCoolDown() {
 bool USkillObject::bCoolDown() {
 	return CoolDownMgr->IsCoolDown();
 }
+
