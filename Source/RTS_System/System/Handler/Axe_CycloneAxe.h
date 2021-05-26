@@ -46,6 +46,7 @@ public:
 		TSubclassOf<UAnimInstance> AxeSkillAnimInstanceClass;
 
 private:
+	FCriticalSection _attack_mutex;
 	FVector MouseLocation;
 	bool bDrawDebug = false;
 	float _offset = 0.f;

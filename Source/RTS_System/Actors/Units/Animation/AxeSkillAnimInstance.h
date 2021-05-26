@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "Animation/AnimInstance.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "AxeSkillAnimInstance.generated.h"
 
 /**
@@ -33,6 +33,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AxeSkill)
 		UAnimMontage* CycloneAxeMontage;
 
-	UPROPERTY(EditAnywhere, Category = Paricle)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Paricle)
 		UParticleSystemComponent* SkillCrack_Hit;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Paricle)
+		UParticleSystemComponent* CycloneAxe_Effect;
 };

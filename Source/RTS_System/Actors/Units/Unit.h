@@ -52,6 +52,8 @@ public:
 	// Variables.
 	UPROPERTY()
 		USphereComponent* AttackRadius;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		USphereComponent* PathFollower;
 
 	// Decoration.
 	UPROPERTY(VisibleAnywhere, Category = UI)

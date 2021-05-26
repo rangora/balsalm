@@ -11,13 +11,14 @@
 //#include "AstarModule.generated.h"
 
 
-static const int POOLSIZE = 128;
+static const int POOLSIZE = 256;
 static const int SEGMENT = 60;
 static const int RADIUS = SEGMENT / 2;
 static const int WIDTH = SEGMENT;
 static const int HEIGHT = SEGMENT;
 
-
+static const bool bDrawPath = false;
+static const bool bDrawSearchNode = false;
 
 
 struct FNode {
@@ -146,10 +147,10 @@ struct FGraph {
 				tNode.bBlocked = true;
 
 			// Debug.
-	/*		if (tNode.bBlocked)
-				DrawDebugSphere(InWorld, tNode.Pos, radius, 20.f, FColor::Black, false, 3.f, 0, 1.f);
-			else
-				DrawDebugSphere(InWorld, tNode.Pos, radius, 20.f, FColor::Blue, false, 3.f, 0, 1.f);*/
+			if (bDrawSearchNode) {
+				if (tNode.bBlocked) DrawDebugSphere(InWorld, tNode.Pos, radius, 20.f, FColor::Black, false, 3.f, 0, 1.f);
+				else DrawDebugSphere(InWorld, tNode.Pos, radius, 20.f, FColor::Blue, false, 3.f, 0, 1.f);
+			}
 
 			NodeMap.Add(tNode.index, tNode);
 			NodeSet.Add(tNode);
@@ -358,9 +359,11 @@ public:
 		Graph.FindPath(StartPos, EndPos, PathVector);
 		
 		// Debug.
-	/*	for (auto path : PathVector) {
-			DrawDebugSphere(Graph.InWorld, path, RADIUS, 20, FColor::Red, false, 1.f);
-		}*/
+		if (bDrawPath) {
+				for (auto path : PathVector) {
+					DrawDebugSphere(Graph.InWorld, path, RADIUS, 20, FColor::Red, false, 1.f);
+				}
+		}
 	}
 
 	FGraph Graph;

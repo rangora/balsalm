@@ -21,16 +21,3 @@ ABaseEquipment::ABaseEquipment() : ItemType(ITEMTYPE::EMPTY) {
 	HitParticle->SetCollisionProfileName("NoCollision");
 	HitParticle->SetupAttachment(EquipmentMesh, FName("HitLocationSocket"));
 }
-
-void ABaseEquipment::BeginPlay() {
-	Super::BeginPlay();
-}
-
-void ABaseEquipment::ActiveHitParticle(UParticleSystemComponent* pParticle) {
-	if(IsValid(pParticle)) {
-		HitParticle->SetTemplate(pParticle->Template);
-		HitParticle->SetRelativeScale3D(pParticle->GetRelativeScale3D());
-		HitParticle->Activate(true);
-	}
-}
-

@@ -2,8 +2,10 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Engine.h"
 #include "UObject/NoExportTypes.h"
+#include "../../Actors/Misc/AttackCaculator.h"
+#include "../../System/MainInstance.h"
 #include "SkillAnimHandler.generated.h"
 
 /**

@@ -33,7 +33,10 @@ AUnit::AUnit()
 	HeadUpHPbar->SetupAttachment(GetMesh());
 
 	AttackRadius = CreateDefaultSubobject<USphereComponent>(TEXT("AttackRadius"));
+	PathFollower = CreateDefaultSubobject<USphereComponent>(TEXT("PathFollower"));
 	AttackRadius->SetupAttachment(GetMesh());
+	PathFollower->SetupAttachment(GetMesh());
+	PathFollower->SetSphereRadius(5.f);
 
 	UnitStat = CreateDefaultSubobject<UStatComponent>(TEXT("UnitStat"));
 	Astar = CreateDefaultSubobject<UAStarComponent>(TEXT("Astar"));

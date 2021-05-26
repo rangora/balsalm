@@ -34,9 +34,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		bool IsClicked(const FVector2D& lh, const FVector2D& rh);
-		
-	UFUNCTION(BlueprintCallable)
-		void MouseLeftButtonActionSwitcher();
 
 	UFUNCTION(BlueprintCallable)
 		void SetMouseLeftButtonAction(LeftButtonAction Action);

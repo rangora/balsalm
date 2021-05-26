@@ -32,12 +32,18 @@ public:
 	UPROPERTY()
 		TArray<USkillObject*> AxeSkills;
 	UPROPERTY()
+		TArray<USkillObject*> SwordSkills;
+	UPROPERTY()
 		TArray<USkillObject*> GunSkills;
 	UPROPERTY()
 		UDataTable* SkillVariableTable;
 
 private:
 	void SkillTableCreate();
+	
+	void InitAxeSkillObject();
+	void InitSwordSkillObject();
 	void InitSkillVariable();
+
 	void SetWeaponSkilData(TArray<UWidget*>& Slots, const SArray* SkillArray, WEAPONTYPE WeaponType);
 };

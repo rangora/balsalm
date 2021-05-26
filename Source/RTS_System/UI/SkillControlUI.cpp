@@ -199,7 +199,8 @@ void USkillControlUI::UpdateUnitSkillData(const ABaseMeleeUnit* pUnit, const UGr
 				UnitSkillObjects[idx - 1]->Clone(UI_SkillSlot->SkillObject);
 			}
 			else {
-				UnitSkillObjects[idx - 1]->GetID() = EMPTY_SKILL_ID;
+				//UnitSkillObjects[idx - 1]->GetID() = EMPTY_SKILL_ID;
+				UnitSkillObjects[idx - 1]->Clear();
 			}
 		}
 

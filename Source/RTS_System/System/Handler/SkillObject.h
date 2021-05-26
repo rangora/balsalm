@@ -15,7 +15,6 @@ struct SkillVariable;
 class UAnimInstance;
 class UCoolDownHandler;
 class USkillAnimHandler;
-class USkillHelper;
 class AUnit;
 class ABaseMeleeUnit;
 
@@ -31,6 +30,7 @@ public:
 	USkillObject();
 	void Init();
 	void Clone(USkillObject* SrcObject);
+	void Clear();
 
 	/* SkillDataHandler. */
 	void SetSkillAnimMgr(USkillAnimHandler* pSkillAnimMgr);
@@ -74,7 +74,4 @@ private:
 		UCoolDownHandler* CoolDownMgr = nullptr;
 	UPROPERTY()
 		USkillAnimHandler* SkillAnimMgr = nullptr;
-	UPROPERTY()
-		USkillHelper* SkillHelper = nullptr;
-	
 };

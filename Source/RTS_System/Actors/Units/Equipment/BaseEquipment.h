@@ -17,9 +17,7 @@ class RTS_SYSTEM_API ABaseEquipment : public AActor {
 	
 public:	
 	ABaseEquipment();
-	virtual void BeginPlay() override;
-	void ActiveHitParticle(UParticleSystemComponent* pParticle);
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadwrite)
 		UStaticMeshComponent* EquipmentMesh;
 	

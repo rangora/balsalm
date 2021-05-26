@@ -72,6 +72,10 @@ void UWeaponListSlot::SetThisWeapon(WEAPONTYPE pWeaponType) {
 			TexPath = WeaponThumbnailPaths[WEAPON_INDEX::GUN];
 			break;
 		}
+		case WEAPONTYPE::SWORD: {
+			TexPath = WeaponThumbnailPaths[WEAPON_INDEX::SWORD];
+			break;
+		}
 		}
 
 		CurrentTexture = LoadObject<UTexture2D>(NULL, *(TexPath), NULL, LOAD_None, NULL);

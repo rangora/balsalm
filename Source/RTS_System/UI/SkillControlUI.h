@@ -13,12 +13,14 @@
 
 static const TArray<FString> WeaponThumbnailPaths = {
 	"/Game/Resources/Thumbnail/Skill/axe_thumbnail01.axe_thumbnail01",
-	"/Game/Resources/Thumbnail/Skill/rifle_thumbnail01.rifle_thumbnail01"
+	"/Game/Resources/Thumbnail/Skill/rifle_thumbnail01.rifle_thumbnail01",
+	"/Game/Resources/Thumbnail/Skill/T_Sword.T_Sword"
 };
 
 static const TArray<WEAPONTYPE> WeaponTypeList = {
 	WEAPONTYPE::AXE,
-	WEAPONTYPE::GUN
+	WEAPONTYPE::GUN,
+	WEAPONTYPE::SWORD
 };
 
 

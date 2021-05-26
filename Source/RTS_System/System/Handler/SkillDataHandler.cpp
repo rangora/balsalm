@@ -37,6 +37,9 @@ void USkillDataHandler::UpdateWeaponSkillSlot(TArray<UWidget*>& Slots, const WEA
 		Target = &GunSkills;
 		break;
 	}
+	case WEAPONTYPE::SWORD: {
+		Target = &SwordSkills;
+	}
 	}
 	SetWeaponSkilData(Slots, Target, WeaponType);
 }
@@ -71,9 +74,13 @@ void USkillDataHandler::SetWeaponSkilData(TArray<UWidget*>& Slots, const SArray*
 ///// Private functions. /////
 
 void USkillDataHandler::SkillTableCreate() {
+	InitAxeSkillObject();
+	InitSwordSkillObject();
+}
+
+void USkillDataHandler::InitAxeSkillObject() {
 	TArray<USkillAnimHandler*> SkillAnimArray;
 	SkillAnimArray.Add(NewObject<UAxe_SkullCrash>());
-	SkillAnimArray.Add(NewObject<UAxe_DualStrike>());
 	SkillAnimArray.Add(NewObject<UAxe_CycloneAxe>());
 	
 	for (int i = 0; i < SkillAnimArray.Num(); i++) {
@@ -82,9 +89,21 @@ void USkillDataHandler::SkillTableCreate() {
 	}
 }
 
+void USkillDataHandler::InitSwordSkillObject() {
+	TArray<USkillAnimHandler*> SkillAnimArray;
+	SkillAnimArray.Add(NewObject<USword_DoubleStrike>());
+
+	for (int i = 0; i < SkillAnimArray.Num(); i++) {
+		SwordSkills.Add(NewObject<USkillObject>());
+		SwordSkills[i]->SetSkillAnimMgr(SkillAnimArray[i]);
+	}
+}
+
+
 void USkillDataHandler::InitSkillVariable() {
 	TArray<SArray*> SkillIndexMatrix;
 	SkillIndexMatrix.Add(&AxeSkills);
+	SkillIndexMatrix.Add(&SwordSkills);
 	//SkillIndexMatrix.Add(&GunSkills);
 
 	for (auto Row : SkillIndexMatrix) {
@@ -106,4 +125,5 @@ void USkillDataHandler::InitSkillVariable() {
 		}
 	}
 }
+
 

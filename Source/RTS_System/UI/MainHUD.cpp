@@ -52,21 +52,6 @@ bool AMainHUD::IsClicked(const FVector2D& lh, const FVector2D& rh) {
 	return true;
 }
 
-void AMainHUD::MouseLeftButtonActionSwitcher() {
-	_mutex.Lock();
-	if (bDragable) {
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("drag not available"));
-		bDragable = false;
-		bTargeting = true;
-	}
-	else {
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("drag available"));
-		bDragable = true;
-		bTargeting = false;
-	}
-	_mutex.Unlock();
-}
-
 void AMainHUD::SetMouseLeftButtonAction(LeftButtonAction Action) {
 	CurrentAction = Action;
 }

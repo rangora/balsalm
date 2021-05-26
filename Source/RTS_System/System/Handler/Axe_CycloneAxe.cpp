@@ -3,12 +3,12 @@
 
 #include "Axe_CycloneAxe.h"
 #include "CoolDownHandler.h"
-#include "SkillHelper.h"
 #include "DrawDebugHelpers.h"
 #include "Components/LineBatchComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "../../Actors/Units/Animation/AxeSkillAnimInstance.h"
 #include "../../Actors/Units/BaseMeleeUnit.h"
+#include "../../Actors/Units/Component/StatComponent.h"
 #include "../../DataTable/ABaseSkillTable.h"
 #include "../../UI/MainHUD.h"
 
@@ -24,10 +24,9 @@ UAxe_CycloneAxe::UAxe_CycloneAxe() {
 
 	SkillAreaDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("D_CycloneAxe"));
 
-	if (MAT_SkillAreaDecal.Succeeded()) {
+	if (MAT_SkillAreaDecal.Succeeded()) 
 		AreaMaterial = MAT_SkillAreaDecal.Object;
-		//SkillAreaDecal->SetDecalMaterial(AreaMaterial);
-	}
+	
 
 	if (ANIM_AxeSkill.Succeeded())
 		AxeSkillAnimInstanceClass = ANIM_AxeSkill.Class;
@@ -41,6 +40,9 @@ void UAxe_CycloneAxe::ActiveSkill(AUnit* pUnit) {
 
 	if (IsValid(IHUD)) {
 		IHUD->SetMouseLeftButtonAction(LeftButtonAction::SKILLAREA);
+
+		auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
+		IUnit->SkillAreaRange->SetVisibility(true);
 	}
 }
 
@@ -84,9 +86,6 @@ void UAxe_CycloneAxe::ShowSkillArea(AUnit* pUnit, FVector CursorLocation) {
 	IUnit->SkillAreaRange->SetDecalMaterial(SkillAreaMaterial);
 	IUnit->SkillAreaRange->DecalSize.Y = range;
 	IUnit->SkillAreaRange->DecalSize.Z = range;
-
-	IUnit->SkillAreaRange->SetVisibility(true);
-	//IUnit->bShowSkillArea = true;
 
 	FVector StartTrace = IUnit->GetActorForwardVector();
 	FVector MouseEnd = CursorLocation - IUnit->GetActorLocation();
@@ -147,6 +146,7 @@ void UAxe_CycloneAxe::AreaSkillJudge(AUnit* pUnit) {
 	auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
 
 	FVector StartTrace = IUnit->GetActorForwardVector();
+	TSet<AUnit*> HitUnits;
 
 	int segment = 10;
 	float corner = SkillParams->Variable03;
@@ -181,12 +181,14 @@ void UAxe_CycloneAxe::AreaSkillJudge(AUnit* pUnit) {
 		for (auto Element : HitResults) {
 			auto aUnit = Cast<ABaseMeleeUnit>(Element.GetActor());
 
-			if (IsValid(aUnit)) {
-				FString name = aUnit->GetName();
-				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green,
-					FString::Printf(TEXT("name:%s"), *name));
+			if (IsValid(aUnit) && aUnit->UnitStat->DeadOrAlive == DOA::ALIVE
+				&& aUnit->unit_Team_Number != IUnit->unit_Team_Number) {
+				if(!HitUnits.Contains(aUnit))
+					HitUnits.Add(aUnit);
 			}
 		}
+		
+		
 
 		if (bDrawDebug) {
 			DrawDebugLine(IUnit->GetWorld(),
@@ -194,6 +196,14 @@ void UAxe_CycloneAxe::AreaSkillJudge(AUnit* pUnit) {
 				v, FColor::Black, false, 0, 3.f);
 		}
 	}
+
+	_attack_mutex.Lock();
+	for (auto Enemy : HitUnits) {
+		float amount = UAttackCaculator::SkillDamage(pUnit, Enemy);
+		FDamageEvent DamageEvent;
+		Enemy->TakeDamage(amount, DamageEvent, pUnit->GetController(), pUnit);
+	}
+	_attack_mutex.Unlock();
 }
 
 

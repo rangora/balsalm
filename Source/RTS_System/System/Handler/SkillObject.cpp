@@ -4,7 +4,6 @@
 #include "SkillObject.h"
 #include "CoolDownHandler.h"
 #include "SkillAnimHandler.h"
-#include "SkillHelper.h"
 #include "Engine/Engine.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "../../ActorType.h"
@@ -15,7 +14,6 @@
 
 USkillObject::USkillObject() {
 	CoolDownMgr = NewObject<UCoolDownHandler>();
-	SkillHelper = NewObject<USkillHelper>();
 }
 
 void USkillObject::SkillActivator(AUnit* pUnit) {
@@ -60,6 +58,10 @@ void USkillObject::Clone(USkillObject* SrcObject) {
 		CoolDownMgr->coolDownMax = SkillAnimMgr->SkillParams->Variable05;
 		SkillCoolTimeAction.BindUFunction(CoolDownMgr, FName("CoolDownTrigger"));
 	}
+}
+
+void USkillObject::Clear() {
+	SkillAnimMgr = nullptr;
 }
 
 void USkillObject::SetSkillAnimMgr(USkillAnimHandler* pSkillAnimMgr) {

@@ -36,7 +36,9 @@ void UAStarComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 	if (bNeedToGo) {
 		TArray<AActor*> PathArray;
-		GetOwner()->GetOverlappingActors(PathArray, APathSphere::StaticClass());
+
+		auto AllyUnit = Cast<AUnit>(GetOwner());
+		AllyUnit->PathFollower->GetOverlappingActors(PathArray, APathSphere::StaticClass());
 
 		// Arrive at a target path sphere.
 		if (PathArray.Num()) {

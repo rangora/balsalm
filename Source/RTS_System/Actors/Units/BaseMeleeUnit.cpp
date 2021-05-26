@@ -100,13 +100,10 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 			|| (DesiredTargetUnit->UnitStat->DeadOrAlive == DOA::DEAD)) return;
 
 		// If the unit is a foe, set as target.
-		if (IMode->player_Team_Number == DesiredTargetUnit->unit_Team_Number) {
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("unit"));
-
+		if (IMode->player_Team_Number != DesiredTargetUnit->unit_Team_Number) {
 
 			if (TargetUnits[0] != DesiredTargetUnit) {
-				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("diff"));
-			
+
 				TargetUnits[0] = DesiredTargetUnit;
 				TurnOnBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER);
 				Astar->MoveToLocation(RB_Vector);
@@ -119,9 +116,9 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 		// Skill can't be canceled.
 		if (CheckBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE)) return;
 
-		_mutex.Lock();
+		_target_mutex.Lock();
 		TargetUnits[0] = nullptr;
-		_mutex.Unlock();
+		_target_mutex.Unlock();
 
 		// Cancel skill targeting process.
 		if (CheckBehavior(UNIT_BEHAVIOR::SKILL_TARGETING)) {
@@ -159,16 +156,16 @@ void ABaseMeleeUnit::BasicAttack() {
 	FHitResult RayCastingResult;
 	FVector TargetLocation;
 
-	_mutex.Lock();
+	_target_mutex.Lock();
 	if (IsValid(TargetUnits[0])) {
 		if (TargetUnits[0]->UnitStat->DeadOrAlive == DOA::ALIVE) {
 			TargetLocation = TargetUnits[0]->GetActorLocation();
-			_mutex.Unlock();
+			_target_mutex.Unlock();
 		}
 		else {
 			TargetUnits[0] = nullptr;
 			TurnOffBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER);
-			_mutex.Unlock();
+			_target_mutex.Unlock();
 			return;
 		}
 	}
@@ -200,6 +197,7 @@ void ABaseMeleeUnit::SkillActivator() {
 
 	float distance = FMath::Abs(FVector::Distance(TargetUnits[0]->GetActorLocation(), GetActorLocation()));
 
+	// Check target is in skill range.
 	if (distance >= 0 && distance <= DecalSkillRange->DecalSize.Y) {
 		if (IsValid(SkillRef)) {
 			StopMovement();
@@ -216,11 +214,14 @@ void ABaseMeleeUnit::SkillActivator() {
 }
 
 void ABaseMeleeUnit::SkillAttackCheck() {
-	if (IsValid(TargetUnits[0])) {
+	_attack_mutex.Lock();
+	if (IsValid(TargetUnits[0]) 
+		&& TargetUnits[0]->UnitStat->DeadOrAlive == DOA::ALIVE) {
 		float amount = UAttackCaculator::SkillDamage(this, TargetUnits[0]);
 		FDamageEvent DamageEvent;
 		TargetUnits[0]->TakeDamage(amount, DamageEvent, GetController(), this);
 	}
+	_attack_mutex.Unlock();
 }
 
 bool ABaseMeleeUnit::CheckBehavior(UNIT_BEHAVIOR var) {
@@ -241,8 +242,6 @@ void ABaseMeleeUnit::TurnOffBehavior(UNIT_BEHAVIOR var) {
 }
 
 void ABaseMeleeUnit::SkillTargetingFinish() {
-	TurnOffBehavior(UNIT_BEHAVIOR::SKILL_TARGETING);
-
 	// Can't be target is myself.
 	if (TargetUnits[0] == this) return;
 	
@@ -251,11 +250,11 @@ void ABaseMeleeUnit::SkillTargetingFinish() {
 
 	// Move to location.
 	FVector TargetLocation;
-	_mutex.Lock();
+	_target_mutex.Lock();
 	if (TargetUnits[0]->UnitStat->DeadOrAlive == DOA::ALIVE) {
 		TargetLocation = TargetUnits[0]->GetActorLocation();
 	}
-	_mutex.Unlock();
+	_target_mutex.Unlock();
 
 	Astar->MoveToLocation(TargetLocation);
 }

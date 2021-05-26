@@ -14,9 +14,6 @@ class RTS_SYSTEM_API ABaseWeapon : public ABaseEquipment {
 	GENERATED_BODY()
 
 public:
-
-
-
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = ItemStat)
 		float WeaponDamage;
 	UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = ItemStat)

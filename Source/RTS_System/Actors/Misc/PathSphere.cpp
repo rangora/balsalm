@@ -8,9 +8,20 @@
 APathSphere::APathSphere() {
 	PrimaryActorTick.bCanEverTick = false;
 	DestSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DestSphere"));
-	DestSphere->SetSphereRadius(5.f);
+	StaticSphere = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticSphere"));
+	StaticSphere->SetVisibility(false);
+
+	DestSphere->SetSphereRadius(30.f);
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> ST_Circle(
+		TEXT("/Engine/BasicShapes/Sphere.Sphere"));
+
+	if (ST_Circle.Succeeded())
+		StaticSphere->SetStaticMesh(ST_Circle.Object);
+
 	DestSphere->SetCollisionProfileName(TEXT("Trigger"));
-	RootComponent = DestSphere;
+	StaticSphere->SetCollisionProfileName(TEXT("Trigger"));
+	RootComponent = StaticSphere;
 }
 
 

@@ -98,6 +98,6 @@ private:
 	UFUNCTION()
 		void DeadProcess();
 
-	FCriticalSection _mutex, _behavior_mutex;
+	FCriticalSection _target_mutex, _attack_mutex, _behavior_mutex;
 	UNIT_BEHAVIOR Behavior;
 };

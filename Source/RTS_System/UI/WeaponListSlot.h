@@ -38,7 +38,8 @@ public:
 private:
 	enum WEAPON_INDEX {
 		AXE,
-		GUN
+		GUN,
+		SWORD
 	};
 };
 
