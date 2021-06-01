@@ -11,7 +11,7 @@ UStatComponent::UStatComponent()
 	currentHP(100),
 	currentDamage(10),
 	attackRange(15),
-	attackSpeed(4),
+	attackSpeed(3),
 	Armor(0) {
 	
 	PrimaryComponentTick.bCanEverTick = false;

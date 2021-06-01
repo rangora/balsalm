@@ -81,7 +81,7 @@ public:
 		UArmStatComponent* ArmStatComponent;
 	UPROPERTY(EditAnywhere)
 		UDecalComponent* DecalSkillRange;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UDecalComponent* SkillAreaRange;
 
 	FTimerHandle AttackSpeedTimer;

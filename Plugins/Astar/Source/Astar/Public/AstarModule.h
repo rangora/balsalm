@@ -11,7 +11,7 @@
 //#include "AstarModule.generated.h"
 
 
-static const int POOLSIZE = 256;
+static const int POOLSIZE = 100;
 static const int SEGMENT = 60;
 static const int RADIUS = SEGMENT / 2;
 static const int WIDTH = SEGMENT;
@@ -122,14 +122,11 @@ struct FGraph {
 			tNode.index = NodeMap.Num();
 			TArray<AActor*> ActorsToIgnore;
 			TArray<AActor*> ActorsToResult;
-			ECollisionChannel TraceChannel = ECC_Pawn;
-			TArray<FOverlapResult> OutHits;
+			ActorsToIgnore.Add(ICharacter);
 
 			TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-			//ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
-			//ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_PhysicsBody));
 
 			UKismetSystemLibrary::SphereOverlapActors((UObject*)InWorld, tNode.Pos, (float)SEGMENT, ObjectTypes,
 				NULL,
@@ -248,16 +245,35 @@ struct FGraph {
 			
 			if (newPos == EndPos) return;
 			
-			NodeMap.Empty();
-			NodeSet.Empty();
+			NodeMap.Reset();
+			NodeSet.Reset();
 			u = FindOrAdd(StartPos);
 			v = FindOrAdd(newPos);
+			
+			if(bDrawPath)
+				DrawDebugSphere(InWorld, v->Pos, RADIUS, 20, FColor::White, false, 2.f);
 		}
 
 		NodeMap[u->index].TotalCost = NodeMap[u->index].TraversalCost = 0;
 		int cIndex = u->index;
 
-		if (!NodeMap.Find(u->index) || !NodeMap.Find(v->index)) return;
+		if (!NodeMap.Find(u->index) || !NodeMap.Find(v->index)) {
+			// debug
+			if (!NodeMap.Find(u->index)) {
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White,
+					FString::Printf(TEXT("start:%d"), u->index));
+			}
+			if (!NodeMap.Find(v->index)) {
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White,
+					FString::Printf(TEXT("end:%d"), v->index));
+			}
+
+
+			return;
+		}
+
+		// Target node index equal to start node index.
+		if (cIndex == v->index) return;
 
 		while(cIndex > -1 && cIndex !=v->index) {
 			if (OpenList->IndexList.Num() > POOLSIZE) break;
@@ -273,7 +289,7 @@ struct FGraph {
 					NodeMap[nIndex].TraversalCost = FMath::Min((int)GetTraversalCost(cIndex, nIndex) + NodeMap[cIndex].TraversalCost, (int)NodeMap[nIndex].TraversalCost);
 
 					if (!NodeMap.Contains(v->index)) break;
-
+					
 					if (NodeMap[nIndex].TotalCost > NodeMap[nIndex].TraversalCost + GetHeuristicCost(nIndex, v->index)) {
 						NodeMap[nIndex].TotalCost = NodeMap[nIndex].TraversalCost + GetHeuristicCost(nIndex, v->index);
 						NodeMap[nIndex].parentIndex = cIndex;
@@ -281,6 +297,7 @@ struct FGraph {
 					}
 				}
 			}
+
 			cIndex = OpenList->HeapPop();
 
 			if (cIndex == v->index) {
@@ -291,7 +308,6 @@ struct FGraph {
 				}
 				return;
 			}
-			
 		}
 	}
 

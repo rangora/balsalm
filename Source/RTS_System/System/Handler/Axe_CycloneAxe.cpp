@@ -14,7 +14,7 @@
 
 
 
-UAxe_CycloneAxe::UAxe_CycloneAxe() {
+UAxe_CycloneAxe::UAxe_CycloneAxe() : segment(18) {
 	Skill_ID = "4";
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_AxeSkill(
@@ -42,7 +42,7 @@ void UAxe_CycloneAxe::ActiveSkill(AUnit* pUnit) {
 		IHUD->SetMouseLeftButtonAction(LeftButtonAction::SKILLAREA);
 
 		auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
-		IUnit->SkillAreaRange->SetVisibility(true);
+		bDrawRange = true;
 	}
 }
 
@@ -96,6 +96,8 @@ void UAxe_CycloneAxe::ShowSkillArea(AUnit* pUnit, FVector CursorLocation) {
 	FRotator TargetRotation = OriginRotation + FRotator{ 0.f, degree, 0.f };
 
 	IUnit->SkillAreaRange->SetRelativeRotation(TargetRotation);
+	IUnit->SkillAreaRange->SetVisibility(bDrawRange);
+
 
 	if (bDrawDebug) {
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::Printf(TEXT("rot:%s"), *TargetRotation.ToString()));
@@ -108,8 +110,8 @@ void UAxe_CycloneAxe::ShowSkillArea(AUnit* pUnit, FVector CursorLocation) {
 	_offset = offset;
 	_degree = degree;
 
+	// hit lines.
 	if (bDrawDebug) {
-		int segment = 10;
 		float sector = corner / float(segment);
 
 		for (int i = 0; i <= segment; i++) {
@@ -123,8 +125,8 @@ void UAxe_CycloneAxe::ShowSkillArea(AUnit* pUnit, FVector CursorLocation) {
 
 			float theta = FMath::DegreesToRadians(angle);
 
-			v.X += FMath::Cos(theta) * 300.f;
-			v.Y += FMath::Sin(theta) * 300.f;
+			v.X += FMath::Cos(theta) * (range + 50.f);
+			v.Y += FMath::Sin(theta) * (range + 50.f);
 			v += IUnit->GetActorLocation();
 
 			DrawDebugLine(IUnit->GetWorld(),
@@ -133,12 +135,16 @@ void UAxe_CycloneAxe::ShowSkillArea(AUnit* pUnit, FVector CursorLocation) {
 		}
 	}
 
+	// coordinate.
 	if (bDrawDebug) {
 		DrawDebugLine(IUnit->GetWorld(), IUnit->GetActorLocation(),
-			(CursorLocation + FVector(0.f, 0.f, IUnit->GetActorLocation().Z)) - IUnit->GetActorLocation() + IUnit->GetActorLocation(), FColor::Green);
-		DrawDebugLine(IUnit->GetWorld(), FVector::ZeroVector + FVector(0.f, 0.f, 500.f),
+			(CursorLocation + FVector(0.f, 0.f,
+			IUnit->GetActorLocation().Z)) - IUnit->GetActorLocation() + IUnit->GetActorLocation(), FColor::Green,
+			false, -1.f, 0, 3.f);
+		DrawDebugLine(IUnit->GetWorld(), IUnit->GetActorLocation() + FVector(0.f, 0.f, 500.f),
 			IUnit->GetActorForwardVector() * 1000.f + FVector(0.f, 0.f, 500.f), FColor::Red);
-		DrawDebugLine(IUnit->GetWorld(), FVector::ZeroVector, FVector(0.f, 0.f, 5000.f), FColor::Black);
+		DrawDebugLine(IUnit->GetWorld(), IUnit->GetActorLocation(), 
+			IUnit->GetActorLocation() + FVector(0.f, 0.f, 5000.f), FColor::Black);
 	}
 }
 
@@ -148,7 +154,6 @@ void UAxe_CycloneAxe::AreaSkillJudge(AUnit* pUnit) {
 	FVector StartTrace = IUnit->GetActorForwardVector();
 	TSet<AUnit*> HitUnits;
 
-	int segment = 10;
 	float corner = SkillParams->Variable03;
 	float range = SkillParams->Variable04;
 
@@ -163,8 +168,8 @@ void UAxe_CycloneAxe::AreaSkillJudge(AUnit* pUnit) {
 
 		float theta = FMath::DegreesToRadians(angle);
 
-		v.X += FMath::Cos(theta) * range;
-		v.Y += FMath::Sin(theta) * range;
+		v.X += FMath::Cos(theta) * (range + 50.f);
+		v.Y += FMath::Sin(theta) * (range + 50.f);
 		v += IUnit->GetActorLocation();
 
 		// Collision.

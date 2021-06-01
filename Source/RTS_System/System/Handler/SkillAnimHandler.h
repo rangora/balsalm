@@ -40,5 +40,7 @@ public:
 
 	FName Skill_ID;
 	// Init in SkillDataHandler. (InitSkillVariable Func)
-	SkillVariable* SkillParams = nullptr;
+	SkillVariable* SkillParams = nullptr;	
+	
+	bool bDrawRange = false;
 };

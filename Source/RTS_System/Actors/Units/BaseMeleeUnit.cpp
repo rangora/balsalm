@@ -116,9 +116,15 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 		// Skill can't be canceled.
 		if (CheckBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE)) return;
 
-		_target_mutex.Lock();
-		TargetUnits[0] = nullptr;
-		_target_mutex.Unlock();
+		//_target_mutex.Lock();
+		if (_target_mutex.TryLock()) {
+			TargetUnits[0] = nullptr;
+			_target_mutex.Unlock();
+		}
+		else {
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White,
+				TEXT("Failed Lock!!"));
+		}
 
 		// Cancel skill targeting process.
 		if (CheckBehavior(UNIT_BEHAVIOR::SKILL_TARGETING)) {
@@ -144,7 +150,9 @@ void ABaseMeleeUnit::FollowTarget() {
 	if (IsValid(TargetUnits[0]) && CheckBehavior(UNIT_BEHAVIOR::MOVABLE)) {
 		Astar->MoveToLocation(TargetUnits[0]->GetActorLocation());
 	}
-	else StopMovement();
+	else {
+		StopMovement();
+	}
 }
 
 void ABaseMeleeUnit::StopMovement() {
@@ -292,7 +300,6 @@ void ABaseMeleeUnit::EquipmentMount(ABaseEquipment* Item) {
 		if (IsValid(IWeapon)) {
 			UnitStat->currentDamage += IWeapon->WeaponDamage;
 			UnitStat->attackRange = IWeapon->WeaponRange;
-			UnitStat->attackSpeed = IWeapon->WeaponSpeed;
 			Weapon->WeaponType = IWeapon->WeaponType;
 		}
 		break;
@@ -335,9 +342,11 @@ void ABaseMeleeUnit::AttackAvailable() {
 
 void ABaseMeleeUnit::DeadProcess() {
 	StopMovement();
-	GetMesh()->SetCollisionProfileName(FName("NoCollision"));
+	SetActorEnableCollision(false);
+
 	bGoBasicAnimInstance = true;
 	DefaultAnimInstance->bDead = true;
+	
 
 	_behavior_mutex.Lock();
 	Behavior = UNIT_BEHAVIOR::NOTHING;

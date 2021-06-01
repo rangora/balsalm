@@ -47,6 +47,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void SkillAction(AUnit* pUnit);
 	
+	UFUNCTION(BlueprintCallable)
+		bool DoDrawSkillRange();
+
 	void AreaSkillJudge(AUnit* pUnit);
 
 	/* Internerally called in skill action function. */

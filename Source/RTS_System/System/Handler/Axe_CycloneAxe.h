@@ -51,4 +51,5 @@ private:
 	bool bDrawDebug = false;
 	float _offset = 0.f;
 	float _degree = 0.f;
+	size_t segment;
 };

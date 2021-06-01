@@ -70,13 +70,14 @@ void UAStarComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UAStarComponent::MoveToLocation(const FVector& LocationValue) {
 	auto InWorld = GetWorld();
-	LocationArray.Empty();
-	PathSpheres.Reset();
+	FVector UnitLocation = GetOwner()->GetActorLocation();
+	
+	ClearRoute();
 
-	Core->Find(GetOwner()->GetActorLocation(), LocationValue, LocationArray, InWorld);
+	Core->Find(UnitLocation, LocationValue, LocationArray, InWorld);
 
 	if (LocationArray.Num()) {
-		LocationArray.Pop();
+		//LocationArray.Pop();
 		bMoving = bNextStep = bNeedToGo = true;
 	}
 }

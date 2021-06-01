@@ -9,6 +9,7 @@
 #include "../../ActorType.h"
 #include "../../UI/QuickSlot.h"
 #include "../../DataTable/ABaseSkillTable.h"
+#include "../../Actors/Units/BaseMeleeUnit.h"
 
 
 
@@ -25,10 +26,17 @@ void USkillObject::CheckSkillRange(AUnit* pUnit) {
 }
 
 void USkillObject::SkillAction(AUnit* pUnit) {
+	auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
+
 	if (SkillCoolTimeAction.IsBound()) {
 		SkillAnimMgr->PlaySkillAnimation(pUnit);
 		SkillCoolTimeAction.Execute(true);
+		SkillAnimMgr->bDrawRange = false;
 	}
+}
+
+bool USkillObject::DoDrawSkillRange() {
+	return SkillAnimMgr->bDrawRange;
 }
 
 void USkillObject::AreaSkillJudge(AUnit* pUnit) {
