@@ -11,7 +11,7 @@
 //#include "AstarModule.generated.h"
 
 
-static const int POOLSIZE = 100;
+static const int POOLSIZE = 1024;
 static const int SEGMENT = 60;
 static const int RADIUS = SEGMENT / 2;
 static const int WIDTH = SEGMENT;
@@ -251,7 +251,7 @@ struct FGraph {
 			v = FindOrAdd(newPos);
 			
 			if(bDrawPath)
-				DrawDebugSphere(InWorld, v->Pos, RADIUS, 20, FColor::White, false, 2.f);
+				DrawDebugSphere(InWorld, v->Pos, RADIUS, 20, FColor::White, false, 4.f);
 		}
 
 		NodeMap[u->index].TotalCost = NodeMap[u->index].TraversalCost = 0;
@@ -303,6 +303,15 @@ struct FGraph {
 			if (cIndex == v->index) {
 				int backIndex = cIndex;
 				while (backIndex != u->index) {
+					//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, 
+					//	FString::Printf(TEXT("backIndex: %d"), backIndex));
+
+					if (!NodeMap.Contains(backIndex)) {
+						GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, 
+							FString::Printf(TEXT("backindex is -1..")));
+						break;
+					}
+
 					OutPath.Add(NodeMap[backIndex].Pos);
 					backIndex = NodeMap[backIndex].parentIndex;
 				}
@@ -316,8 +325,8 @@ struct FGraph {
 	}
 
 	void Reset() {
-		NodeMap.Reset();
-		NodeSet.Reset();
+		NodeMap.Empty(POOLSIZE / 2);
+		NodeSet.Empty(POOLSIZE / 2);
 		OpenList->Clear();
 		CloseList->Clear();
 	}

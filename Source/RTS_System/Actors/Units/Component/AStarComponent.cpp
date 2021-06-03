@@ -76,10 +76,15 @@ void UAStarComponent::MoveToLocation(const FVector& LocationValue) {
 
 	Core->Find(UnitLocation, LocationValue, LocationArray, InWorld);
 
-	if (LocationArray.Num()) {
-		//LocationArray.Pop();
-		bMoving = bNextStep = bNeedToGo = true;
-	}
+	int32 num = LocationArray.Num();
+
+	if(num) bMoving = bNextStep = bNeedToGo = true;
+	if(num > 1) LocationArray.Pop();
+
+	//if (LocationArray.Num()) {
+	//	LocationArray.Pop();
+	//	bMoving = bNextStep = bNeedToGo = true;
+	//}
 }
 
 void UAStarComponent::ClearRoute() {

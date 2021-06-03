@@ -90,7 +90,6 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IMode == nullptr || (IMode->player_Team_Number != unit_Team_Number)) return;
 	
-
 	// Check wheater the clicked target is a unit or not.
 	if (Target->IsA(AUnit::StaticClass())) {
 
@@ -140,6 +139,7 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 		TurnOnBehavior(UNIT_BEHAVIOR::MOVABLE);
 		TurnOffBehavior(UNIT_BEHAVIOR::ATTACKING);
 		TurnOffBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER);
+
 
 		// Move to location.
 		Astar->MoveToLocation(RB_Vector);
@@ -218,7 +218,9 @@ void ABaseMeleeUnit::SkillActivator() {
 			_behavior_mutex.Unlock();
 		}
 	}
-	else FollowTarget();
+	else {
+		FollowTarget();
+	}
 }
 
 void ABaseMeleeUnit::SkillAttackCheck() {
