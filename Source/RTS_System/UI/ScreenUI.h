@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FogManager.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/Image.h"
 #include "ScreenUI.generated.h"
 
 /**
@@ -30,4 +32,10 @@ public:
 
 	UPROPERTY()
 		UGridPanel* SkillPanel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadwrite, meta = (BindWidget))
+		UImage* WorldMap;
+
+	UPROPERTY()
+		AFogManager* FogMgr = nullptr;
 };

@@ -46,21 +46,23 @@ public:
 	//How far will an actor be able to see
 	//CONSIDER: Place it on the actors to allow for individual sight-radius
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FogOfWar)
-		float SightRange = 9.0f;
+		float SightRange = 16.0f;
 
 	//The number of samples per 100 unreal units
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FogOfWar)
-		float SamplesPerMeter = 2.0f;
+		float SamplesPerMeter = 4.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FogOfWar)
-		//FColor	ColorOne = FColor((uint8)255, (uint8)255, (uint8)255, 255);
-		uint8	UnfogColor = (uint8)255;
+		uint8 UnfogColor = (uint8)255;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FogOfWar)
-		uint8	FowMaskColor = (uint8)100;
+		uint8 FowMaskColor = (uint8)100;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FogOfWar)
+		int TexelUnit = 50;
 
 	UPROPERTY(EditAnywhere, Category = FogOfWar)
-		bool bUseTextureFile = true;
+		bool bUseTextureFile = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FogOfWar)
 		UTexture2D* TextureInFile = nullptr;
@@ -71,7 +73,7 @@ public:
 
 	//Should we blur? It takes up quite a lot of CPU time...
 	UPROPERTY(EditAnywhere)
-		bool bIsBlurEnabled = true;
+		bool bIsBlurEnabled = false;
 
 	//The size of our textures
 	uint32 TextureSize = 1024;
@@ -95,20 +97,11 @@ public:
 	UPROPERTY()
 		TArray<FColor> TextureInFileData;
 
-	//Time Array
-	UPROPERTY()
-		TArray<float> FOWTimeArray;
-
 	UPROPERTY()
 		TArray<bool> FOWArray;
 
-	UPROPERTY(EditAnywhere)
-		bool bIsFowTimerEnabled = false;
-
-	UPROPERTY(EditAnywhere)
-		float FowTimeLimit = 10.0f;
-
-	//Check to see if we have a new FOW-texture.
+	// Check to see if we have a new FOW-texture.
+	// Control by Worker.
 	bool bHasFOWTextureUpdate = false;
 
 	//Blur size
@@ -138,20 +131,16 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
-protected:
-
-	virtual void BeginPlay() override;
-
-private:
-
-	//void UpdateFowTexture();
-
-	//Triggers the start of a new FOW-texture-update
-	void StartFOWTextureUpdate();
-
 	//Our dynamically updated texture
 	UPROPERTY()
 		UTexture2D* FOWTexture;
+
+protected:
+	virtual void BeginPlay() override;
+
+private:
+	// Triggers the start of a new FOW-texture-update
+	void StartFOWTextureUpdate();
 
 	//Texture from last update. We blend between the two to do a smooth unveiling of newly discovered areas.
 	UPROPERTY()
@@ -162,8 +151,4 @@ private:
 
 	//Our fowupdatethread
 	AFogOfWarWorker* FowThread;
-
-	//This is for accessing the actor component "RegisterToFow_BP"
-	UActorComponent* ActorComp = nullptr;
-
 };

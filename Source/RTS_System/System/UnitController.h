@@ -7,13 +7,12 @@
 #include "UnitController.generated.h"
 
 
+
+
 UCLASS()
 class RTS_SYSTEM_API AUnitController : public AAIController {
 	GENERATED_BODY()
 	
 public:
 	AUnitController();
-	virtual void Tick(float delta) override;
-	virtual void BeginPlay() override;
-
 };

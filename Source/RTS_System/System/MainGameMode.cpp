@@ -2,6 +2,9 @@
 
 
 #include "MainGameMode.h"
+#include "FogRegister.h"
+#include "FogManager.h"
+#include "../Actors/Units/Unit.h"
 #include "Runtime/Engine/Public/EngineUtils.h"
 
 AMainGameMode::AMainGameMode() :
@@ -15,7 +18,4 @@ void AMainGameMode::Tick(float delta) {
 
 void AMainGameMode::BeginPlay() {
 	Super::BeginPlay();
-
-	//PlayerFow = GetWorld()->SpawnActor<AFow>(AFow::StaticClass(),
-	//	FVector(0.f, 0.f, 600.f), FRotator::ZeroRotator);
 }

@@ -28,7 +28,8 @@ public class FogOFWar : ModuleRules
 				"Core",
 				"RHI",
 				"InputCore",
-				"RenderCore"
+				"RenderCore",
+				"RTS_System"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

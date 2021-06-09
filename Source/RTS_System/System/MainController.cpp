@@ -75,15 +75,12 @@ void AMainController::OpenOrCloseSkillPanel() {
 			if (SkillUI->OpenOrClose()) {
 				SkillUI->UnitSkillConnector(ControllableUnit, true);				
 				MainHUD->SetMouseLeftButtonAction(LeftButtonAction::NONE);
-				//MainHUD->SetDragable(false);
 			}
 			// UI close action.
 			else {
 				SkillUI->UnitSkillConnector(ControllableUnit, false);
 				SkillUI->Clear();
 				MainHUD->SetMouseLeftButtonAction(LeftButtonAction::DRAG);
-
-				//MainHUD->SetDragable(true);
 
 				auto pScreenWidget = Cast<UScreenUI>(MainHUD->ScreenUIWidget);
 				pScreenWidget->UpdateSkillSlots(Units[0]);
@@ -115,7 +112,6 @@ void AMainController::ActiveQuickSlot(int32 idx) {
 
 
 			if (IsValid(UnitSkillObject)) {
-				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("ActiveQuickSlot"));
 				Units[0]->SkillRef = UnitSkillObject;				
 				UnitSkillObject->SkillActivator(Units[0]);
 			}

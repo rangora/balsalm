@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Engine.h"
+#include "Misc/ScopeLock.h"
 #include "GameFramework/Character.h"
 #include "Components/WidgetComponent.h"
 #include "Unit.generated.h"
@@ -26,6 +27,7 @@ class RTS_SYSTEM_API AUnit : public ACharacter {
 public:
 	AUnit();
 	virtual void BeginPlay() override;
+	virtual void Tick(float delta) override;
 	virtual float TakeDamage(float damageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* Causer) override;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -33,6 +35,12 @@ public:
 	virtual void Interaction_Implementation(const FVector& RB_Vector, AActor* Target);
 
 	virtual void AttackCheck();
+
+	void SetVisivility(bool bVisible);
+	void GetGazerUnit(AUnit* Gazer);
+	void UnitVision();
+	float GetSightRange();
+
 
 	// For external bluerpint.
 	UFUNCTION(BlueprintCallable)
@@ -70,6 +78,16 @@ public:
 	// External module.
 	UPROPERTY()
 		UAStarComponent* Astar;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = FogOfWar)
 		UFogRegister* FogRegister = nullptr;
+
+	// Sight control.
+	FCriticalSection _visionMutex;
+	
+	UPROPERTY()
+		TSet<AUnit*> GazerUnit;
+	/*UPROPERTY()
+		TSet<AUnit*> RemoveUnit;*/
+	UPROPERTY(EditAnywhere)
+		int32 SightRange = 16;
 };

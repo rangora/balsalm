@@ -2,6 +2,7 @@
 
 
 #include "FogManager.h"
+#include "Engine/Engine.h"
 #include "FogOfWarWorker.h"
 #include "FogRegister.h"
 
@@ -47,7 +48,9 @@ void AFogManager::StartFOWTextureUpdate() {
 	if (!FOWTexture) {
 		FOWTexture = UTexture2D::CreateTransient(TextureSize, TextureSize);
 		LastFOWTexture = UTexture2D::CreateTransient(TextureSize, TextureSize);
+		
 		int arraySize = TextureSize * TextureSize;
+		
 		TextureData.Init(FColor(0, 0, 0, 255), arraySize);
 		LastFrameTextureData.Init(FColor(0, 0, 0, 255), arraySize);
 		HorizontalBlurData.Init(0, arraySize);
@@ -55,7 +58,7 @@ void AFogManager::StartFOWTextureUpdate() {
 		FowThread = new AFogOfWarWorker(this);
 
 		//Time stuff
-		FOWTimeArray.Init(0.0f, arraySize);
+		//FOWTimeArray.Init(0.0f, arraySize);
 		FOWArray.Init(false, arraySize);
 	}
 
@@ -65,11 +68,11 @@ void AFogManager::StartFOWTextureUpdate() {
 	if (GetIsTextureFileEnabled()) {
 
 		if (!TextureInFile) {
-
 			UE_LOG(LogTemp, Error, TEXT("Missing texture in LevelInfo, please load the mask!"));
 			return;
 		}
 		if (TextureInFile != nullptr) {
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("tex yes!!"));
 
 			int TextureInFileSize = TextureInFile->GetSizeX();
 			TextureInFileData.Init(FColor(1, 1, 1, 255), TextureInFileSize * TextureInFileSize);
@@ -135,6 +138,9 @@ void AFogManager::StartFOWTextureUpdate() {
 		}
 
 	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("no texture use"));
+	}
 }
 
 bool AFogManager::GetIsBlurEnabled() {
@@ -151,22 +157,15 @@ void AFogManager::LogNames() {
 		UE_LOG(LogTemp, Warning, TEXT("The name of this actor is: %s"), *Name);
 		Name = Actor->FindComponentByClass<UFogRegister>()->GetName();
 		UE_LOG(LogTemp, Warning, TEXT("And the actor has a component: %s"), *Name);
-		bool temp = Actor->FindComponentByClass<UFogRegister>()->WriteTerraIncog;
-		if (temp) {
-			UE_LOG(LogTemp, Warning, TEXT("can write Terra Incognita: TRUE"));
-		}
-		else {
-			UE_LOG(LogTemp, Warning, TEXT("can write Terra Incognita: FALSE"));
-		}
-
-
 	}
 }
 
 void AFogManager::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
+	// Be sure it have safe texture and blended updated.
 	if (FOWTexture && LastFOWTexture && bHasFOWTextureUpdate && bIsDoneBlending) {
+
 		LastFOWTexture->UpdateResource();
 		UpdateTextureRegions(LastFOWTexture, (int32)0, (uint32)1, textureRegions, (uint32)(4 * TextureSize), (uint32)4, (uint8*)LastFrameTextureData.GetData(), false);
 		FOWTexture->UpdateResource();
@@ -175,30 +174,6 @@ void AFogManager::Tick(float DeltaTime) {
 		bIsDoneBlending = false;
 		//Trigger the blueprint update
 		OnFowTextureUpdated(FOWTexture, LastFOWTexture);
-	}
-
-
-
-	if (bIsFowTimerEnabled) {
-		//Keeping the Measure of the time outside the Worker thread, otherwise the it does not work
-		//i guest that asking for the delta seconds inside the worker that not make sense, hence, it is detached
-		//from the main game thread
-		//also this part of the code is NOT inside the if that checks for bIsDoneBlending
-		int signedSize = (int)TextureSize;
-		for (int y = 0; y < signedSize; y++) {
-			for (int x = 0; x < signedSize; x++) {
-
-				//check the FOWArray written by the worker, if is tagged for keeping the time then:
-				if (FOWArray[x + y * signedSize]) {
-					FOWTimeArray[x + y * signedSize] = (FOWTimeArray[x + y * signedSize]) + (GetWorld()->GetDeltaSeconds());
-				}
-				//if the current value is not tagged for time, reset the value
-				if (!FOWArray[x + y * signedSize]) {
-					FOWTimeArray[x + y * signedSize] = 0.0f;
-				}
-
-			}
-		}
 	}
 }
 
@@ -213,10 +188,8 @@ void AFogManager::RegisterFowActor(AActor* Actor) {
 }
 
 void AFogManager::UpdateTextureRegions(UTexture2D* Texture, int32 MipIndex, uint32 NumRegions, FUpdateTextureRegion2D* Regions, uint32 SrcPitch, uint32 SrcBpp, uint8* SrcData, bool bFreeData) {
-	if (Texture && Texture->Resource)
-	{
-		struct FUpdateTextureRegionsData
-		{
+	if (Texture && Texture->Resource) {
+		struct FUpdateTextureRegionsData {
 			FTexture2DResource* Texture2DResource;
 			int32 MipIndex;
 			uint32 NumRegions;
@@ -237,14 +210,10 @@ void AFogManager::UpdateTextureRegions(UTexture2D* Texture, int32 MipIndex, uint
 		RegionData->SrcData = SrcData;
 
 		ENQUEUE_RENDER_COMMAND(FUpdateTextureRegionsData)(
-			[RegionData = RegionData, bFreeData = bFreeData](FRHICommandListImmediate& RHICmdList)
-
-			{
-				for (uint32 RegionIndex = 0; RegionIndex < RegionData->NumRegions; ++RegionIndex)
-				{
+			[RegionData = RegionData, bFreeData = bFreeData](FRHICommandListImmediate& RHICmdList) {
+				for (uint32 RegionIndex = 0; RegionIndex < RegionData->NumRegions; ++RegionIndex) {
 					int32 CurrentFirstMip = RegionData->Texture2DResource->GetCurrentFirstMip();
-					if (RegionData->MipIndex >= CurrentFirstMip)
-					{
+					if (RegionData->MipIndex >= CurrentFirstMip) {
 						RHIUpdateTexture2D(
 							RegionData->Texture2DResource->GetTexture2DRHI(),
 							RegionData->MipIndex - CurrentFirstMip,
@@ -256,8 +225,7 @@ void AFogManager::UpdateTextureRegions(UTexture2D* Texture, int32 MipIndex, uint
 						);
 					}
 				}
-				if (bFreeData)
-				{
+				if (bFreeData) {
 					FMemory::Free(RegionData->Regions);
 					FMemory::Free(RegionData->SrcData);
 				}

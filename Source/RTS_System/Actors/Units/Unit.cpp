@@ -8,6 +8,7 @@
 #include "../../UI/HeadUpHPbar.h"
 #include "../Misc/PathSphere.h"
 #include "../Misc/AttackCaculator.h"
+#include "Equipment/BaseWeapon.h"
 #include "Component/StatComponent.h"
 #include "Component/AstarComponent.h"
 #include "Component/DecoComponent.h"
@@ -54,10 +55,19 @@ AUnit::AUnit()
 
 void AUnit::BeginPlay() {
 	Super::BeginPlay();
+}
+
+void AUnit::Tick(float delta) {
+	Super::Tick(delta);
+
+	int n = GazerUnit.Num();
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red,
+	//	FString::Printf(TEXT("n: %d"),n));
 
 	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (unit_Team_Number == IMode->player_Team_Number) {
-		FogRegister->RegisterToManager();
+	
+	if(IMode->player_Team_Number != unit_Team_Number) {
+		UnitVision();
 	}
 }
 
@@ -84,6 +94,71 @@ void AUnit::AttackCheck() {
 		TargetUnit->TakeDamage(amount, DamageEvent, GetController(), this);
 	}
 }
+
+void AUnit::SetVisivility(bool bVisible) {
+	GetMesh()->SetVisibility(bVisible);
+	Weapon->SetVisibility(bVisible);
+	HeadUpHPbar->SetVisibility(bVisible);
+}
+
+void AUnit::GetGazerUnit(AUnit* Gazer) {
+	FScopeLock _lockGaurd(&_visionMutex);
+
+	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (!IsValid(Gazer) || Gazer->IsPendingKill()) return;
+	if (IMode->player_Team_Number == unit_Team_Number) return;
+
+	if (!GazerUnit.Contains(Gazer)) {
+		GazerUnit.Add(Gazer);
+	}
+}
+
+void AUnit::UnitVision() {
+	if (_visionMutex.TryLock()) {
+		FCollisionQueryParams LayTraceParams(FName(TEXT("EnemyVision Params")), false, this);
+		FHitResult Results;
+		TSet<AUnit*> RemoveUnit;
+		bool bHit;
+
+		for (auto Element : GazerUnit) {
+			bool bRemove = false;
+
+			bHit = GetWorld()->LineTraceSingleByChannel(Results, GetActorLocation(), Element->GetActorLocation(),
+				ECollisionChannel::ECC_WorldStatic, LayTraceParams);
+
+
+			if (Results.Distance > Element->GetSightRange()) {
+				bRemove = true;
+			}
+			else if (bHit) {
+				auto TActor = Results.GetActor();
+				if (!TActor->IsA(AUnit::StaticClass())) {
+					bRemove = true;
+				}
+			}
+
+			if (bRemove) 
+				RemoveUnit.Add(Element);
+		}
+		
+		for (auto Element : RemoveUnit) {
+			GazerUnit.Remove(Element);
+		}
+		
+		if (GazerUnit.Num()) {
+			SetVisivility(true);
+		}
+		else SetVisivility(false);
+
+		_visionMutex.Unlock();
+	}
+}
+
+float AUnit::GetSightRange() {
+	return SightRange * FogRegister->Manager->TexelUnit;
+}
+
 
 void AUnit::SetTargetUnit(AUnit* pUnit) {
 	if (IsValid(pUnit)) 

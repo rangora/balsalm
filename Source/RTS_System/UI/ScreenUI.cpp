@@ -11,6 +11,8 @@
 #include "UMG/Public/Components/GridPanel.h"
 #include "UMG/Public/Blueprint/WidgetTree.h"
 
+
+
 UScreenUI::UScreenUI(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer) {
 	SkillPanel = nullptr;
@@ -22,10 +24,26 @@ void UScreenUI::NativeConstruct() {
 	SkillPanel = this->WidgetTree->FindWidget<UGridPanel>("SkillPanel");
 	if (SkillPanel) 
 		SkillPanel->SetVisibility(ESlateVisibility::Hidden);
+
+	// Get Fogmanager.
+	auto InWorld = GetWorld();
+
+	for (const auto& entity : TActorRange<AActor>(InWorld)) {
+		auto IActor = Cast<AFogManager>(entity);
+		if (IsValid(IActor)) {
+			FogMgr = IActor;
+			break;
+		}
+	}
 }
 
 void UScreenUI::NativeTick(const FGeometry& MyGeometry, float delta) {
 	Super::NativeTick(MyGeometry, delta);
+
+	if (IsValid(WorldMap) && IsValid(FogMgr)) {
+		auto CurrentMapTexture = FogMgr->FOWTexture;
+		WorldMap->SetBrushFromTexture(CurrentMapTexture);
+	}
 }
 
 void UScreenUI::SetSkillPanelVisibility(bool trigger) {

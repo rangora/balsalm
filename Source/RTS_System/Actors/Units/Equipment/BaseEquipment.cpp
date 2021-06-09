@@ -21,3 +21,7 @@ ABaseEquipment::ABaseEquipment() : ItemType(ITEMTYPE::EMPTY) {
 	HitParticle->SetCollisionProfileName("NoCollision");
 	HitParticle->SetupAttachment(EquipmentMesh, FName("HitLocationSocket"));
 }
+
+void ABaseEquipment::SetVisibility(bool bVisible) {
+	EquipmentMesh->SetVisibility(bVisible);
+}

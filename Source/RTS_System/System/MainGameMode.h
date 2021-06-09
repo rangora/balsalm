@@ -3,8 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FogManager.h"
 #include "GameFramework/GameModeBase.h"
 #include "MainGameMode.generated.h"
+
+
+
+class AUnit;
 
 
 UCLASS()
@@ -15,6 +20,7 @@ public:
 	AMainGameMode();
 	virtual void Tick(float delta) override;
 	virtual void BeginPlay() override;
+
 
 	int player_Team_Number;
 };

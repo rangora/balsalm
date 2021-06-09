@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/StaticMeshComponent.h"
 #include "../../../ActorType.h"
 #include "GameFramework/Actor.h"
 #include "BaseEquipment.generated.h"
@@ -17,7 +18,8 @@ class RTS_SYSTEM_API ABaseEquipment : public AActor {
 	
 public:	
 	ABaseEquipment();
-	
+	void SetVisibility(bool bVisible);
+
 	UPROPERTY(EditAnywhere, BlueprintReadwrite)
 		UStaticMeshComponent* EquipmentMesh;
 	

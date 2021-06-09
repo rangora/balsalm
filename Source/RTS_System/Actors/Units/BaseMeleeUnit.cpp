@@ -2,6 +2,8 @@
 
 
 #include "BaseMeleeUnit.h"
+#include "FogRegister.h"
+#include "FogManager.h"
 #include "Engine/Engine.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Component/StatComponent.h"
@@ -48,6 +50,12 @@ void ABaseMeleeUnit::Tick(float delta) {
 	if (CheckBehavior(UNIT_BEHAVIOR::BASICATTACK_ORDER)) BasicAttack();
 	if (CheckBehavior(UNIT_BEHAVIOR::SKILL_ACTIVE_ORDER)) SkillActivator();
 	if (bGoBasicAnimInstance) SetBasicAnimInstance();
+
+	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (IMode->player_Team_Number == unit_Team_Number) {
+		//Debug_FogVision();
+	}
 }
 
 void ABaseMeleeUnit::BeginPlay() {
@@ -68,7 +76,16 @@ void ABaseMeleeUnit::BeginPlay() {
 		SampleWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, WeaponSocket);
 		Weapon = SampleWeapon;
 		EquipmentMount(Weapon);
-	}	
+	}
+
+	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (unit_Team_Number == IMode->player_Team_Number) {
+		FogRegister->RegisterToManager();
+		SetVisivility(true);
+	}
+	else {
+		SetVisivility(false);
+	}
 }
 
 void ABaseMeleeUnit::PostInitializeComponents() {
@@ -88,7 +105,7 @@ void ABaseMeleeUnit::Interaction_Implementation(const FVector& RB_Vector, AActor
 
 	// Check whether unit is a ally or not.
 	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IMode == nullptr || (IMode->player_Team_Number != unit_Team_Number)) return;
+	//if (IMode == nullptr || (IMode->player_Team_Number != unit_Team_Number)) return;
 	
 	// Check wheater the clicked target is a unit or not.
 	if (Target->IsA(AUnit::StaticClass())) {
@@ -318,6 +335,86 @@ void ABaseMeleeUnit::EquipmentMount(ABaseEquipment* Item) {
 
 
 
+
+void ABaseMeleeUnit::Debug_FogVision() {
+	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	
+	if (IMode == nullptr || (IMode->player_Team_Number != unit_Team_Number)) return;
+
+	auto FogMgr = FogRegister->Manager;
+
+	uint32 halfTextureSize = FogMgr->TextureSize / 2;
+	int signedSize = (int)FogMgr->TextureSize;
+	int sightTexels = SightRange * FogMgr->SamplesPerMeter;
+	int size = (int)FogMgr->TextureSize;
+	float dividend = FogMgr->TexelUnit / FogMgr->SamplesPerMeter;
+
+	TSet<FVector2D> currentlyInSight;
+	TSet<FVector2D> texelsToBlur;
+
+	FVector position = GetActorLocation();
+
+
+	// Change world location to texture location.
+	int posX = (int)(position.X / dividend) + halfTextureSize;
+	int posY = (int)(position.Y / dividend) + halfTextureSize;
+
+	FVector2D textureSpacePos = FVector2D(posX, posY);
+
+	FCollisionQueryParams LayTraceParams(FName(TEXT("LayTraceParams")), false, this);
+
+
+
+	//Unveil the positions our actors are currently looking at
+	for (int y = posY - sightTexels; y <= posY + sightTexels; y++) {
+		for (int x = posX - sightTexels; x <= posX + sightTexels; x++) {
+
+			//Kernel for radial sight
+			if (x > 0 && x < size && y > 0 && y < size) {
+				FVector2D currentTextureSpacePos = FVector2D(x, y);
+				int length = (int)(textureSpacePos - currentTextureSpacePos).Size();
+
+
+				if (length <= sightTexels) {
+					
+
+					FVector currentWorldSpacePos = FVector(
+						((x - (int)halfTextureSize)) * dividend,
+						((y - (int)halfTextureSize)) * dividend,
+						position.Z);
+
+					
+					FHitResult Result;
+					AUnit* TUnit = nullptr;
+					if (GetWorld()->LineTraceSingleByChannel(Result, position, currentWorldSpacePos,
+						ECollisionChannel::ECC_WorldStatic, LayTraceParams)) {
+						auto HitActor = Result.GetActor();
+						
+						if (HitActor->IsA(AUnit::StaticClass())) {
+							TUnit = Cast<AUnit>(HitActor);
+							DrawDebugBox(GetWorld(), currentWorldSpacePos,
+								FVector(2, 2, 2), FColor::Green);
+
+							if(IMode->player_Team_Number != TUnit->unit_Team_Number)
+								DrawDebugLine(GetWorld(), position, HitActor->GetActorLocation(),
+									FColor::Red, false, -1.f,0,5.f);
+						}
+						else DrawDebugBox(GetWorld(), currentWorldSpacePos,
+							FVector(2, 2, 2), FColor::Red);
+					}
+					
+
+					else {
+						DrawDebugBox(GetWorld(), currentWorldSpacePos,
+							FVector(2, 2, 2), FColor::Green);
+					}
+				}
+			}
+		}
+	}
+	
+
+}
 
 /* Private functions. */
 void ABaseMeleeUnit::AfterAttack() {

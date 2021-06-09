@@ -90,6 +90,9 @@ public:
 	bool bGoBasicAnimInstance = false;
 	bool bShowSkillArea = false;
 
+	// debug.
+	void Debug_FogVision();
+
 private:
 	// Get target info from mainHUD.
 	void AfterAttack();
