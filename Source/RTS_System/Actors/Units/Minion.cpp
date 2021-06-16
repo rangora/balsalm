@@ -6,6 +6,6 @@
 
 
 AMinion::AMinion() {
-	AIControllerClass = AMinionController::StaticClass();
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	/*AIControllerClass = AMinionController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;*/
 }

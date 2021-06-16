@@ -24,10 +24,12 @@ public:
 	//Method to perform work
 	void UpdateFowTexture();
 
-	FRunnableThread* Thread;
+	UPROPERTY()
+		FRunnableThread* Thread;
 
 	//Pointer to our manager
-	AFogManager* Manager;
+	UPROPERTY()
+		AFogManager* Manager;
 
 	//Thread safe counter
 	FThreadSafeCounter StopTaskCounter;

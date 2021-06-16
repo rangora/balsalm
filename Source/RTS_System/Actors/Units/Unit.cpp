@@ -6,6 +6,7 @@
 #include "../../System/MainController.h"
 #include "../../System/MainGameMode.h"
 #include "../../UI/HeadUpHPbar.h"
+#include "../../ActorType.h"
 #include "../Misc/PathSphere.h"
 #include "../Misc/AttackCaculator.h"
 #include "Equipment/BaseWeapon.h"
@@ -61,8 +62,6 @@ void AUnit::Tick(float delta) {
 	Super::Tick(delta);
 
 	int n = GazerUnit.Num();
-	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red,
-	//	FString::Printf(TEXT("n: %d"),n));
 
 	auto IMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	
@@ -75,12 +74,6 @@ float AUnit::TakeDamage(float damageAmount, FDamageEvent const& DamageEvent, ACo
 	float totalDamage = Super::TakeDamage(damageAmount, DamageEvent, EventInstigator, Causer);
 	
 	UnitStat->TakeDamage(totalDamage);
-
-	// debug
-	float am =UnitStat->currentHP;
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, 
-		FString::Printf(TEXT("am:%f"),am));
-
 	return totalDamage;
 }
 
@@ -108,6 +101,7 @@ void AUnit::GetGazerUnit(AUnit* Gazer) {
 
 	if (!IsValid(Gazer) || Gazer->IsPendingKill()) return;
 	if (IMode->player_Team_Number == unit_Team_Number) return;
+	if (Gazer->UnitStat->DeadOrAlive == DOA::DEAD) return;
 
 	if (!GazerUnit.Contains(Gazer)) {
 		GazerUnit.Add(Gazer);
@@ -129,6 +123,9 @@ void AUnit::UnitVision() {
 
 
 			if (Results.Distance > Element->GetSightRange()) {
+				bRemove = true;
+			}
+			else if (Element->UnitStat->DeadOrAlive == DOA::DEAD) {
 				bRemove = true;
 			}
 			else if (bHit) {

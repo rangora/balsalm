@@ -26,6 +26,9 @@ public:
 	void ClearRoute();
 
 	UFUNCTION()
+		void PathFindTimerFunc();
+
+	UFUNCTION()
 		void FollowThePath();
 
 	bool bMoving;
@@ -38,8 +41,10 @@ private:
 	
 	bool bNeedToGo;
 	bool bNextStep;
+	bool bTimeToFinding = true;
 
 	AstarPathFinding* Core;
 	FDelePathFind Dele_PathFind;
+	FTimerHandle PathFindTimer;
 
 };

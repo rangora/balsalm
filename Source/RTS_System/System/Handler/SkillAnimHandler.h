@@ -3,7 +3,9 @@
 #pragma once
 
 #include "Engine.h"
+#include "Animation/AnimInstance.h"
 #include "UObject/NoExportTypes.h"
+#include "Templates/SubclassOf.h"
 #include "../../Actors/Misc/AttackCaculator.h"
 #include "../../System/MainInstance.h"
 #include "SkillAnimHandler.generated.h"
@@ -37,6 +39,10 @@ public:
 	virtual void AreaSkillJudge(AUnit* pUnit);
 
 	
+	UPROPERTY()
+		UAnimInstance* SkillAnimInstance;
+	UPROPERTY()
+		TSubclassOf<UAnimInstance> SkillAnimInstanceClass;
 
 	FName Skill_ID;
 	// Init in SkillDataHandler. (InitSkillVariable Func)

@@ -17,7 +17,7 @@ USword_DoubleStrike::USword_DoubleStrike() {
 		TEXT("/Game/Mannequin/Animations/ANIM_UnitSwordSkill.ANIM_UnitSwordSkill_C"));
 
 	if (ANIM_SwordSkill.Succeeded())
-		SwordSkillAnimInstanceClass = ANIM_SwordSkill.Class;
+		SkillAnimInstanceClass = ANIM_SwordSkill.Class;
 }
 
 void USword_DoubleStrike::ActiveSkill(AUnit* pUnit) {
@@ -52,7 +52,7 @@ void USword_DoubleStrike::PlaySkillAnimation(AUnit* pUnit) {
 	auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
 
 	IUnit->GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	IUnit->GetMesh()->SetAnimInstanceClass(SwordSkillAnimInstanceClass);
+	IUnit->GetMesh()->SetAnimInstanceClass(SkillAnimInstanceClass);
 
 	auto pAnim = IUnit->GetMesh()->GetAnimInstance();
 	auto SwordAnim = Cast<USwordSkillAnimInstance>(pAnim);

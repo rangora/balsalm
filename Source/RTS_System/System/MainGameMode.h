@@ -21,6 +21,5 @@ public:
 	virtual void Tick(float delta) override;
 	virtual void BeginPlay() override;
 
-
 	int player_Team_Number;
 };

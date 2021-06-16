@@ -16,7 +16,7 @@ UAxe_SkullCrash::UAxe_SkullCrash() {
 		TEXT("/Game/Mannequin/Animations/ANIM_UnitAxeSkill.ANIM_UnitAxeSkill_C"));
 
 	if (ANIM_AxeSkill.Succeeded())
-		AxeSkillAnimInstanceClass = ANIM_AxeSkill.Class;
+		SkillAnimInstanceClass = ANIM_AxeSkill.Class;
 }
 
 void UAxe_SkullCrash::CheckSkillRange(AUnit* pUnit) {
@@ -53,7 +53,7 @@ void UAxe_SkullCrash::PlaySkillAnimation(AUnit* pUnit) {
 	auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
 
 	IUnit->GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	IUnit->GetMesh()->SetAnimInstanceClass(AxeSkillAnimInstanceClass);
+	IUnit->GetMesh()->SetAnimInstanceClass(SkillAnimInstanceClass);
 
 	auto pAnim = IUnit->GetMesh()->GetAnimInstance();
 	auto AxeAnim = Cast<UAxeSkillAnimInstance>(pAnim);

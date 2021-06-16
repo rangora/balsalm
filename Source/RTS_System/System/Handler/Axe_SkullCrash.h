@@ -26,10 +26,4 @@ public:
 	void CheckSkillRange(AUnit* pUnit) override;
 	void ActiveSkill(AUnit* pUnit) override;
 	void PlaySkillAnimation(AUnit* pUnit) override;
-
-
-	UPROPERTY()
-		UAxeSkillAnimInstance* AxeSkillAnimInstance;
-	UPROPERTY()
-		TSubclassOf<UAnimInstance> AxeSkillAnimInstanceClass;
 };

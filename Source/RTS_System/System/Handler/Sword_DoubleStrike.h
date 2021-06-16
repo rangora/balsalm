@@ -23,9 +23,4 @@ public:
 	void ActiveSkill(AUnit* pUnit) override;
 	void CheckSkillRange(AUnit* pUnit) override;
 	void PlaySkillAnimation(AUnit* pUnit) override;
-
-	UPROPERTY()
-		USwordSkillAnimInstance* SwordSkillAnimInstance;
-	UPROPERTY()
-		TSubclassOf<UAnimInstance> SwordSkillAnimInstanceClass;
 };

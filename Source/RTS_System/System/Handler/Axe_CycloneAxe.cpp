@@ -29,7 +29,7 @@ UAxe_CycloneAxe::UAxe_CycloneAxe() : segment(18) {
 	
 
 	if (ANIM_AxeSkill.Succeeded())
-		AxeSkillAnimInstanceClass = ANIM_AxeSkill.Class;
+		SkillAnimInstanceClass = ANIM_AxeSkill.Class;
 }
 
 
@@ -50,7 +50,7 @@ void UAxe_CycloneAxe::PlaySkillAnimation(AUnit* pUnit) {
 	auto IUnit = Cast<ABaseMeleeUnit>(pUnit);
 
 	IUnit->GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	IUnit->GetMesh()->SetAnimInstanceClass(AxeSkillAnimInstanceClass);
+	IUnit->GetMesh()->SetAnimInstanceClass(SkillAnimInstanceClass);
 
 	MouseLocation.Z = IUnit->GetActorLocation().Z;
 	
@@ -131,7 +131,7 @@ void UAxe_CycloneAxe::ShowSkillArea(AUnit* pUnit, FVector CursorLocation) {
 
 			DrawDebugLine(IUnit->GetWorld(),
 				IUnit->GetActorLocation(),
-				v, FColor::Black, false, 0, 3.f);
+				v, FColor::Black, false, -1.f, 0, 5.f);
 		}
 	}
 
@@ -140,7 +140,7 @@ void UAxe_CycloneAxe::ShowSkillArea(AUnit* pUnit, FVector CursorLocation) {
 		DrawDebugLine(IUnit->GetWorld(), IUnit->GetActorLocation(),
 			(CursorLocation + FVector(0.f, 0.f,
 			IUnit->GetActorLocation().Z)) - IUnit->GetActorLocation() + IUnit->GetActorLocation(), FColor::Green,
-			false, -1.f, 0, 3.f);
+			false, -1.f, 0, 8.f);
 		DrawDebugLine(IUnit->GetWorld(), IUnit->GetActorLocation() + FVector(0.f, 0.f, 500.f),
 			IUnit->GetActorForwardVector() * 1000.f + FVector(0.f, 0.f, 500.f), FColor::Red);
 		DrawDebugLine(IUnit->GetWorld(), IUnit->GetActorLocation(), 

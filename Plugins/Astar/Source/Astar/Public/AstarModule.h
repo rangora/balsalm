@@ -20,6 +20,7 @@ static const int HEIGHT = SEGMENT;
 static const bool bDrawPath = false;
 static const bool bDrawSearchNode = false;
 
+static const float showtime = 2.f;
 
 struct FNode {
 	FNode() 
@@ -145,8 +146,8 @@ struct FGraph {
 
 			// Debug.
 			if (bDrawSearchNode) {
-				if (tNode.bBlocked) DrawDebugSphere(InWorld, tNode.Pos, radius, 20.f, FColor::Black, false, 3.f, 0, 1.f);
-				else DrawDebugSphere(InWorld, tNode.Pos, radius, 20.f, FColor::Blue, false, 3.f, 0, 1.f);
+				if (tNode.bBlocked) DrawDebugSphere(InWorld, tNode.Pos, radius, 20.f, FColor::Black, false, showtime, 0, 1.f);
+				else DrawDebugSphere(InWorld, tNode.Pos, radius, 20.f, FColor::Blue, false, showtime, 0, 1.f);
 			}
 
 			NodeMap.Add(tNode.index, tNode);
@@ -386,7 +387,7 @@ public:
 		// Debug.
 		if (bDrawPath) {
 				for (auto path : PathVector) {
-					DrawDebugSphere(Graph.InWorld, path, RADIUS, 20, FColor::Red, false, 1.f);
+					DrawDebugSphere(Graph.InWorld, path, RADIUS, 20, FColor::Red, false, showtime);
 				}
 		}
 	}

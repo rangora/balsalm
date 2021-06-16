@@ -37,7 +37,7 @@ public:
 	void SetSkillParams(SkillVariable* pSkillVariable);
 
 
-	/* Functions are binding with SkillAnimMgr. */
+	/* Functions are binding with SkillActionMgr. */
 	void SkillActivator(AUnit* pUnit);
 	void CheckSkillRange(AUnit* pUnit);
 	
@@ -76,5 +76,5 @@ private:
 	UPROPERTY(BlueprintReadwrite, meta = (AllowPrivateAccess = "true"))
 		UCoolDownHandler* CoolDownMgr = nullptr;
 	UPROPERTY()
-		USkillAnimHandler* SkillAnimMgr = nullptr;
+		USkillAnimHandler* SkillActionMgr = nullptr;
 };

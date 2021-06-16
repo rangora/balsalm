@@ -2,6 +2,7 @@
 
 
 #include "StatComponent.h"
+#include "Engine/Engine.h"
 
 
 UStatComponent::UStatComponent()
@@ -38,8 +39,9 @@ void UStatComponent::TakeDamage(float totalDamage) {
 	
 	// Dead check.
 	if (DeadOrAlive == DOA::DEAD) {
-		if (AfterDeadProcess.IsBound())
+		if (AfterDeadProcess.IsBound()) {
 			AfterDeadProcess.Execute();
+		}
 	}
 
 	_mutex.Unlock();

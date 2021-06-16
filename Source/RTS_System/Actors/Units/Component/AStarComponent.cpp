@@ -2,6 +2,7 @@
 
 
 #include "AStarComponent.h"
+#include "TimerManager.h"
 #include "../../../System/UnitController.h"
 #include "../../Misc/PathSphere.h"
 #include "../Unit.h"
@@ -23,11 +24,15 @@ UAStarComponent::~UAStarComponent() {
 void UAStarComponent::BeginPlay() {
 	Super::BeginPlay();
 	Core = new AstarPathFinding(GetOwner());
+
 }
 
 void UAStarComponent::InitializeComponent() {
 	Super::InitializeComponent();
 	Dele_PathFind.BindUFunction(this, FName("FollowThePath"));
+
+	GetOwner()->GetWorldTimerManager().SetTimer(PathFindTimer,
+		this, &UAStarComponent::PathFindTimerFunc, 0.2f, true);
 }
 
 
@@ -72,24 +77,25 @@ void UAStarComponent::MoveToLocation(const FVector& LocationValue) {
 	auto InWorld = GetWorld();
 	FVector UnitLocation = GetOwner()->GetActorLocation();
 	
-	ClearRoute();
 
-	Core->Find(UnitLocation, LocationValue, LocationArray, InWorld);
+	if (bTimeToFinding) {
+		ClearRoute();
+		Core->Find(UnitLocation, LocationValue, LocationArray, InWorld);
+		bTimeToFinding = false;
 
-	int32 num = LocationArray.Num();
-
-	if(num) bMoving = bNextStep = bNeedToGo = true;
-	if(num > 1) LocationArray.Pop();
-
-	//if (LocationArray.Num()) {
-	//	LocationArray.Pop();
-	//	bMoving = bNextStep = bNeedToGo = true;
-	//}
+		int32 num = LocationArray.Num();
+		if (num > 1) LocationArray.Pop();
+		if (num) bMoving = bNextStep = bNeedToGo = true;
+	}
 }
 
 void UAStarComponent::ClearRoute() {
 	LocationArray.Empty();
 	PathSpheres.Reset();
+}
+
+void UAStarComponent::PathFindTimerFunc() {
+	bTimeToFinding = true;
 }
 
 void UAStarComponent::FollowThePath() {

@@ -43,7 +43,7 @@ public:
 	virtual void Tick(float delta) override;
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;
-	
+
 	// Mouse right button action.
 	virtual void Interaction_Implementation(const FVector& RB_Vector, AActor* Target);
 
@@ -68,7 +68,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void TurnOffSkillRange();
 
-
+	UFUNCTION()
+		void DestroyCaller();
 	UFUNCTION()
 		void SetBasicAnimInstance();
 
@@ -85,6 +86,7 @@ public:
 		UDecalComponent* SkillAreaRange;
 
 	FTimerHandle AttackSpeedTimer;
+	FTimerHandle DestroyTimer;
 
 	float skillRadius;
 	bool bGoBasicAnimInstance = false;

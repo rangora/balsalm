@@ -10,6 +10,11 @@
 #include "../Actors/Units/Unit.h"
 
 
+
+const bool AMinionController::bTracing = false;
+
+
+
 AMinionController::AMinionController() {
 	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBObject(
 		TEXT("/Game/AI/BB_Minion.BB_Minion"));
@@ -25,7 +30,11 @@ AMinionController::AMinionController() {
 void AMinionController::OnPossess(APawn* MUnit) {
 	Super::OnPossess(MUnit);
 	if (UseBlackboard(BB_Minion, Blackboard)) {
-		Blackboard->SetValueAsVector(TEXT("BottomOrigin"), FVector(-220.f,460.f,0.f));
+
+		for (int idx = 0; idx < BB_Minion_VectorValueName.Num(); idx++) {
+			Blackboard->SetValueAsVector(BB_Minion_VectorValueName[idx], 
+				BB_EnemyMinion_VectorValue[idx]);
+		}
 
 		RunBehaviorTree(BT_Minion);
 	}

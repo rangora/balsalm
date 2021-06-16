@@ -216,6 +216,11 @@ void ABaseMeleeUnit::FaceTarget() {
 	}
 }
 
+void ABaseMeleeUnit::DestroyCaller() {
+	Weapon->Destroy();
+	Destroy();
+}
+
 void ABaseMeleeUnit::SkillActivator() {
 	// Check target validation.
 	if (!IsValid(TargetUnits[0])) return;
@@ -345,9 +350,10 @@ void ABaseMeleeUnit::Debug_FogVision() {
 
 	uint32 halfTextureSize = FogMgr->TextureSize / 2;
 	int signedSize = (int)FogMgr->TextureSize;
-	int sightTexels = SightRange * FogMgr->SamplesPerMeter;
+	int sightTexels = SightRange;
 	int size = (int)FogMgr->TextureSize;
-	float dividend = FogMgr->TexelUnit / FogMgr->SamplesPerMeter;
+	float dividend = FogMgr->TexelUnit;
+	float tSize = FogMgr->TexelUnit;
 
 	TSet<FVector2D> currentlyInSight;
 	TSet<FVector2D> texelsToBlur;
@@ -369,6 +375,11 @@ void ABaseMeleeUnit::Debug_FogVision() {
 	for (int y = posY - sightTexels; y <= posY + sightTexels; y++) {
 		for (int x = posX - sightTexels; x <= posX + sightTexels; x++) {
 
+			FVector currentWorldSpacePos = FVector(
+				((x - (int)halfTextureSize)) * dividend,
+				((y - (int)halfTextureSize)) * dividend,
+				position.Z);
+
 			//Kernel for radial sight
 			if (x > 0 && x < size && y > 0 && y < size) {
 				FVector2D currentTextureSpacePos = FVector2D(x, y);
@@ -376,12 +387,7 @@ void ABaseMeleeUnit::Debug_FogVision() {
 
 
 				if (length <= sightTexels) {
-					
-
-					FVector currentWorldSpacePos = FVector(
-						((x - (int)halfTextureSize)) * dividend,
-						((y - (int)halfTextureSize)) * dividend,
-						position.Z);
+				
 
 					
 					FHitResult Result;
@@ -393,22 +399,29 @@ void ABaseMeleeUnit::Debug_FogVision() {
 						if (HitActor->IsA(AUnit::StaticClass())) {
 							TUnit = Cast<AUnit>(HitActor);
 							DrawDebugBox(GetWorld(), currentWorldSpacePos,
-								FVector(2, 2, 2), FColor::Green);
+								FVector(tSize, tSize, 2), FColor::Green);
 
 							if(IMode->player_Team_Number != TUnit->unit_Team_Number)
 								DrawDebugLine(GetWorld(), position, HitActor->GetActorLocation(),
 									FColor::Red, false, -1.f,0,5.f);
 						}
 						else DrawDebugBox(GetWorld(), currentWorldSpacePos,
-							FVector(2, 2, 2), FColor::Red);
+							FVector(tSize, tSize, 2), FColor::Red);
 					}
 					
 
 					else {
 						DrawDebugBox(GetWorld(), currentWorldSpacePos,
-							FVector(2, 2, 2), FColor::Green);
+							FVector(tSize, tSize, 2), FColor::Green);
 					}
 				}
+				// inner texel, but not sight.
+				
+			}
+
+			else {
+				DrawDebugBox(GetWorld(), currentWorldSpacePos,
+					FVector(tSize, tSize, 2), FColor::White);
 			}
 		}
 	}
@@ -446,14 +459,13 @@ void ABaseMeleeUnit::DeadProcess() {
 	bGoBasicAnimInstance = true;
 	DefaultAnimInstance->bDead = true;
 	
-
 	_behavior_mutex.Lock();
 	Behavior = UNIT_BEHAVIOR::NOTHING;
 	_behavior_mutex.Unlock();
 
 	// Set docoes unvisibility.
-	Deco->SelectionMeshRef->SetVisibility(false);
-	Deco->HeadUpHPbarRef->SetVisibility(false);
+	HeadUpHPbar->SetVisibility(false);
+	SelectionMesh->SetVisibility(false);
 
 
 	// Clear skill HUD if selected a ally unit.
@@ -466,4 +478,6 @@ void ABaseMeleeUnit::DeadProcess() {
 			}
 		}
 	}
+
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &ABaseMeleeUnit::DestroyCaller, 5.f, false);
 }

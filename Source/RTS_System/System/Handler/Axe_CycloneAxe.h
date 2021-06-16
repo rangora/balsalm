@@ -40,10 +40,6 @@ public:
 		UMaterialInterface* AreaMaterial;
 	UPROPERTY()
 		UDecalComponent* SkillAreaDecal;
-	UPROPERTY()
-		UAxeSkillAnimInstance* AxeSkillAnimInstance;
-	UPROPERTY()
-		TSubclassOf<UAnimInstance> AxeSkillAnimInstanceClass;
 
 private:
 	FCriticalSection _attack_mutex;

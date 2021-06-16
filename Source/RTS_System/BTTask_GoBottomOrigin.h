@@ -17,4 +17,5 @@ public:
 	
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& MinionComp, uint8* mem) override;
 
+	int locationIdx;
 };
